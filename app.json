@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "shopease-mobile",
+    "name": "shopease",
     "slug": "shopease-mobile",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -19,10 +19,20 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.vaibhav2556.shopeasemobile"
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "6431c493-1383-4025-8b5e-a1633eb3d540"
+      }
+    },
+    "plugins": [
+      "expo-asset",
+      "expo-font"
+    ]
   }
 }
