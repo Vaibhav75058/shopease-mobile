@@ -4,30 +4,41 @@ import React, {
 } from "react";
 
 import {
-  SafeAreaView,
-} from "react-native-safe-area-context";
-
-import {
   View,
   Text,
   FlatList,
   StyleSheet,
+  ActivityIndicator,
+  Image,
 } from "react-native";
 
 import axios from "axios";
 
-import Ionicons
-  from "@expo/vector-icons/Ionicons";
+import {
+  SafeAreaView,
+} from "react-native-safe-area-context";
 
-import { useAuth }
-  from "../src/context/AuthContext";
+import {
+  useAuth,
+} from "../src/context/AuthContext";
 
 export default function MyOrdersScreen() {
 
-  const { user } = useAuth();
+  const auth =
+    useAuth();
 
-  const [orders, setOrders] =
-    useState([]);
+  const user =
+    auth?.user;
+
+  const [
+    orders,
+    setOrders,
+  ] = useState([]);
+
+  const [
+    loading,
+    setLoading,
+  ] = useState(true);
 
   useEffect(() => {
 
@@ -35,82 +46,63 @@ export default function MyOrdersScreen() {
 
   }, []);
 
-  const fetchOrders = async () => {
+  const fetchOrders =
+    async () => {
 
-    try {
+      try {
 
-      const config = {
+        const response =
+          await axios.get(
 
-        headers: {
+            "https://e-commerce-mern-stack-0okr.onrender.com/api/orders/myorders",
 
-          Authorization:
-            `Bearer ${user.token}`,
+            {
 
-        },
+              headers: {
 
-      };
+                Authorization:
+                  `Bearer ${user.token}`,
 
-      const response =
-        await axios.get(
+              },
 
-          "https://e-commerce-mern-stack-0okr.onrender.com/api/orders/myorders",
+            }
 
-          config
+          );
 
+        setOrders(
+          response.data
         );
 
-      setOrders(response.data);
+      } catch (error) {
 
-    } catch (error) {
+        console.log(error);
 
-      console.log(error);
+      } finally {
 
-    }
+        setLoading(false);
 
-  };
+      }
 
-  const getStatusUI = (status) => {
+    };
 
-    switch (status) {
+  if (loading) {
 
-      case "Processing":
+    return (
 
-        return {
-          color: "#ff9800",
-          icon: "time-outline",
-        };
+      <SafeAreaView
+        style={styles.loader}
+      >
 
-      case "Shipped":
+        <ActivityIndicator
+          size="large"
+          color="#2874f0"
+        />
 
-        return {
-          color: "#2196f3",
-          icon: "car-outline",
-        };
+      </SafeAreaView>
 
-      case "Out For Delivery":
+    );
 
-        return {
-          color: "#9c27b0",
-          icon: "bicycle-outline",
-        };
-
-      case "Delivered":
-
-        return {
-          color: "#4caf50",
-          icon: "checkmark-circle",
-        };
-
-      default:
-
-        return {
-          color: "#666",
-          icon: "cube-outline",
-        };
-
-    }
-
-  };
+  }
 
   return (
 
@@ -118,197 +110,87 @@ export default function MyOrdersScreen() {
       style={styles.container}
     >
 
-      <Text style={styles.heading}>
-        My Orders
-      </Text>
-
       <FlatList
 
         data={orders}
 
-        keyExtractor={(item) => item._id}
+        keyExtractor={(item) =>
+          item._id
+        }
 
-        showsVerticalScrollIndicator={false}
+        showsVerticalScrollIndicator={
+          false
+        }
 
-        renderItem={({ item }) => {
+        ListEmptyComponent={
 
-          const statusUI =
-            getStatusUI(item.status);
+          <View style={styles.emptyBox}>
 
-          return (
+            <Text style={styles.emptyText}>
+              No Orders Yet
+            </Text>
 
-            <View style={styles.card}>
+          </View>
 
-              <View style={styles.topRow}>
+        }
 
-                <Text style={styles.id}>
-                  Order #{item._id.slice(-6)}
-                </Text>
+        renderItem={({ item }) => (
 
-                <Text style={styles.price}>
-                  ₹ {item.totalPrice}
-                </Text>
+          <View style={styles.card}>
 
-              </View>
+            {/* PRODUCT IMAGE */}
 
-              <View style={styles.statusRow}>
+            <Image
 
-                <Ionicons
-                  name={statusUI.icon}
-                  size={22}
-                  color={statusUI.color}
-                />
+              source={{
+                uri:
+                  item.orderItems[0]
+                    ?.image,
+              }}
 
-                <Text
-                  style={[
-                    styles.statusText,
-                    {
-                      color:
-                        statusUI.color,
-                    },
-                  ]}
-                >
-                  {item.status ||
-                    "Processing"}
-                </Text>
+              style={styles.image}
 
-              </View>
+            />
 
-              <View style={styles.timeline}>
+            {/* INFO */}
 
-                <View
-                  style={styles.timelineItem}
-                >
+            <View style={styles.info}>
 
-                  <View
-                    style={[
+              <Text
+                numberOfLines={1}
+                style={styles.productName}
+              >
 
-                      styles.circle,
+                {
+                  item.orderItems[0]
+                    ?.name
+                }
 
-                      styles.activeCircle,
+              </Text>
 
-                    ]}
-                  />
+              <Text style={styles.price}>
+                ₹ {item.totalPrice}
+              </Text>
 
-                  <Text
-                    style={
-                      styles.timelineText
-                    }
-                  >
-                    Ordered
-                  </Text>
+              <Text style={styles.status}>
+                {item.status}
+              </Text>
 
-                </View>
+              <Text style={styles.date}>
+                {
 
-                <View
-                  style={styles.line}
-                />
+                  new Date(
+                    item.createdAt
+                  ).toDateString()
 
-                <View
-                  style={styles.timelineItem}
-                >
-
-                  <View
-                    style={[
-
-                      styles.circle,
-
-                      (item.status ===
-                        "Shipped" ||
-
-                        item.status ===
-                          "Out For Delivery" ||
-
-                        item.status ===
-                          "Delivered") &&
-
-                        styles.activeCircle,
-
-                    ]}
-                  />
-
-                  <Text
-                    style={
-                      styles.timelineText
-                    }
-                  >
-                    Shipped
-                  </Text>
-
-                </View>
-
-                <View
-                  style={styles.line}
-                />
-
-                <View
-                  style={styles.timelineItem}
-                >
-
-                  <View
-                    style={[
-
-                      styles.circle,
-
-                      (item.status ===
-                        "Out For Delivery" ||
-
-                        item.status ===
-                          "Delivered") &&
-
-                        styles.activeCircle,
-
-                    ]}
-                  />
-
-                  <Text
-                    style={
-                      styles.timelineText
-                    }
-                  >
-                    Delivery
-                  </Text>
-
-                </View>
-
-                <View
-                  style={styles.line}
-                />
-
-                <View
-                  style={styles.timelineItem}
-                >
-
-                  <View
-                    style={[
-
-                      styles.circle,
-
-                      item.status ===
-                        "Delivered" &&
-
-                        styles.activeCircle,
-
-                    ]}
-                  />
-
-                  <Text
-                    style={
-                      styles.timelineText
-                    }
-                  >
-                    Delivered
-                  </Text>
-
-                </View>
-
-              </View>
+                }
+              </Text>
 
             </View>
 
-          );
+          </View>
 
-        }}
+        )}
 
       />
 
@@ -324,145 +206,124 @@ const styles = StyleSheet.create({
 
     flex: 1,
 
-    backgroundColor: "#fff",
+    backgroundColor:
+      "#f5f7fb",
 
     padding: 15,
 
   },
 
+  loader: {
+
+    flex: 1,
+
+    justifyContent:
+      "center",
+
+    alignItems:
+      "center",
+
+  },
+
   heading: {
 
-    fontSize: 30,
+    fontSize: 28,
 
     fontWeight: "bold",
 
     marginBottom: 20,
 
-    color: "#1a1a2e",
+    color: "#111",
 
   },
 
   card: {
 
-    backgroundColor: "#f5f5f5",
+    backgroundColor:
+      "white",
 
-    padding: 18,
+    borderRadius: 20,
 
-    borderRadius: 18,
-
-    marginBottom: 18,
-
-  },
-
-  topRow: {
+    padding: 12,
 
     flexDirection: "row",
 
-    justifyContent: "space-between",
+    marginBottom: 16,
 
-    alignItems: "center",
-
-    marginBottom: 15,
+    elevation: 3,
 
   },
 
-  id: {
+  image: {
 
-    fontSize: 16,
+    width: 100,
+
+    height: 100,
+
+    borderRadius: 16,
+
+  },
+
+  info: {
+
+    flex: 1,
+
+    marginLeft: 14,
+
+    justifyContent:
+      "space-between",
+
+  },
+
+  productName: {
+
+    fontSize: 17,
 
     fontWeight: "bold",
 
-    color: "#1a1a2e",
+    color: "#111",
 
   },
 
   price: {
 
-    fontSize: 18,
+    fontSize: 22,
 
     fontWeight: "bold",
 
-    color: "#e94560",
+    color: "#2874f0",
 
   },
 
-  statusRow: {
+  status: {
 
-    flexDirection: "row",
-
-    alignItems: "center",
-
-    marginBottom: 20,
-
-  },
-
-  statusText: {
-
-    fontSize: 16,
+    color: "green",
 
     fontWeight: "bold",
 
-    marginLeft: 8,
+  },
+
+  date: {
+
+    color: "gray",
 
   },
 
-  timeline: {
+  emptyBox: {
 
-    flexDirection: "row",
-
-    alignItems: "center",
-
-    justifyContent: "space-between",
-
-  },
-
-  timelineItem: {
+    marginTop: 100,
 
     alignItems: "center",
 
   },
 
-  circle: {
+  emptyText: {
 
-    width: 18,
+    fontSize: 22,
 
-    height: 18,
+    color: "gray",
 
-    borderRadius: 20,
-
-    backgroundColor: "#ccc",
-
-    marginBottom: 6,
-
-  },
-
-  activeCircle: {
-
-    backgroundColor: "#4caf50",
-
-  },
-
-  line: {
-
-    flex: 1,
-
-    height: 3,
-
-    backgroundColor: "#ccc",
-
-    marginHorizontal: 5,
-
-    marginBottom: 22,
-
-  },
-
-  timelineText: {
-
-    fontSize: 11,
-
-    color: "#555",
-
-    textAlign: "center",
+    fontWeight: "bold",
 
   },
 

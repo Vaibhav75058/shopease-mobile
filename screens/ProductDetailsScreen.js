@@ -1,4 +1,22 @@
-import React from "react";
+import React, {
+  useState,
+} from "react";
+
+import AwesomeAlert
+  from "react-native-awesome-alerts";
+
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  ScrollView,
+  TouchableOpacity,
+} from "react-native";
+
+import {
+  useWishlist,
+} from "../src/context/WishlistContext";
 
 import {
   SafeAreaView,
@@ -8,162 +26,258 @@ import Ionicons
   from "@expo/vector-icons/Ionicons";
 
 import {
-  useWishlist,
-} from "../src/context/WishlistContext";
-
-import {
-  View,
-  Alert,
-  Text,
-  Image,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
-} from "react-native";
-
-import { useCart }
-  from "../src/context/CartContext";
-
-import { useNavigation }
-  from "@react-navigation/native";
+  useCart,
+} from "../src/context/CartContext";
 
 export default function ProductDetailsScreen({
 
   route,
+  navigation,
 
 }) {
 
-  const { product } = route.params;
+  const { product } =
+    route.params;
 
-  const { addToCart } =
-    useCart();
+  const cart = useCart();
 
-  const {
-    wishlistItems,
-    addToWishlist,
-  } = useWishlist();
+  const addToCart =
+    cart?.addToCart;
 
-  const navigation =
-    useNavigation();
+  const wishlist =
+    useWishlist();
 
-  const isWishlisted =
-  wishlistItems.some(
-    (x) => x._id === product._id
-  );
+  const addToWishlist =
+    wishlist?.addToWishlist;
+
+  const [
+    showAlert,
+    setShowAlert,
+  ] = useState(false);
 
   return (
 
     <SafeAreaView
+      edges={["top"]}
       style={styles.container}
     >
 
-      <ScrollView>
+      <ScrollView
+        showsVerticalScrollIndicator={
+          false
+        }
+      >
 
-        <View>
+        {/* PRODUCT IMAGE */}
+
+        <View style={styles.imageContainer}>
 
           <Image
+
             source={{
               uri: product.image,
             }}
+
             style={styles.image}
+
           />
+
+          {/* WISHLIST */}
 
           <TouchableOpacity
 
-            style={
-              styles.wishlistButton
-            }
+            style={styles.wishlist}
 
             onPress={() => {
 
               addToWishlist(product);
 
-              Alert.alert(
+              setShowAlert(true);
 
-                "Wishlist",
+              setTimeout(() => {
 
-                isWishlisted
-                  ? "Removed from wishlist 💔"
-                  : "Added to wishlist ❤️"
+                setShowAlert(false);
 
-              );
+              }, 1800);
 
             }}
 
           >
 
             <Ionicons
-
-              name={
-                isWishlisted
-                  ? "heart"
-                  : "heart-outline"
-              }
-
-              size={30}
-
-              color="#e94560"
-
+              name="heart-outline"
+              size={26}
+              color="#111"
             />
 
           </TouchableOpacity>
 
         </View>
 
-        <Text style={styles.name}>
-          {product.name}
-        </Text>
+        {/* PRODUCT INFO */}
 
-        <Text style={styles.price}>
-          ₹ {product.price}
-        </Text>
+        <View style={styles.infoContainer}>
 
-        <Text style={styles.description}>
-          {product.description}
-        </Text>
-
-        <TouchableOpacity
-
-          style={styles.button}
-
-          onPress={() => {
-
-            addToCart(product);
-
-            Alert.alert(
-              "Success",
-              "Product added to cart 😄"
-            );
-
-          }}
-
-        >
-
-          <Text style={styles.buttonText}>
-            Add To Cart
+          <Text style={styles.name}>
+            {product.name}
           </Text>
 
-        </TouchableOpacity>
+          {/* RATINGS */}
+
+          <View style={styles.ratingRow}>
+
+            <View style={styles.ratingBox}>
+
+              <Text style={styles.rating}>
+                4.4 ★
+              </Text>
+
+            </View>
+
+            <Text style={styles.ratingText}>
+              12,430 Ratings
+            </Text>
+
+          </View>
+
+          {/* PRICE */}
+
+          <View style={styles.priceRow}>
+
+            <Text style={styles.price}>
+              ₹ {product.price}
+            </Text>
+
+            <Text style={styles.oldPrice}>
+              ₹ {product.price + 2500}
+            </Text>
+
+            <Text style={styles.discount}>
+              45% OFF
+            </Text>
+
+          </View>
+
+          {/* OFFERS */}
+
+          <View style={styles.offerBox}>
+
+            <Text style={styles.offerTitle}>
+              Available Offers
+            </Text>
+
+            <Text style={styles.offer}>
+              • Bank Offer 10% Instant
+              Discount
+            </Text>
+
+            <Text style={styles.offer}>
+              • Special Price Get extra
+              ₹500 off
+            </Text>
+
+            <Text style={styles.offer}>
+              • Free Delivery
+            </Text>
+
+          </View>
+
+          {/* DESCRIPTION */}
+
+          <Text style={styles.sectionTitle}>
+            Description
+          </Text>
+
+          <Text style={styles.description}>
+            {product.description ||
+              "Premium quality product with modern design and best performance."}
+          </Text>
+
+          {/* DELIVERY */}
+
+          <View style={styles.deliveryBox}>
+
+            <Ionicons
+              name="location-outline"
+              size={24}
+              color="#2874f0"
+            />
+
+            <Text style={styles.deliveryText}>
+              Delivery in 2-4 days
+            </Text>
+
+          </View>
+
+        </View>
+
+      </ScrollView>
+
+      {/* BOTTOM BUTTONS */}
+
+      <View style={styles.bottomBar}>
 
         <TouchableOpacity
 
           style={styles.cartButton}
 
           onPress={() =>
+            addToCart(product)
+          }
 
-            navigation.navigate("Cart")
+        >
 
+          <Ionicons
+            name="cart"
+            size={22}
+            color="white"
+          />
+
+          <Text style={styles.buttonText}>
+            Add to Cart
+          </Text>
+
+        </TouchableOpacity>
+
+        <TouchableOpacity
+
+          style={styles.buyButton}
+
+          onPress={() =>
+            navigation.navigate(
+              "Checkout"
+            )
           }
 
         >
 
           <Text style={styles.buttonText}>
-            Go To Cart
+            Buy Now
           </Text>
 
         </TouchableOpacity>
 
-      </ScrollView>
+      </View>
+
+      {/* ALERT */}
+
+      <AwesomeAlert
+
+        show={showAlert}
+
+        showProgress={false}
+
+        title="Wishlist ❤️"
+
+        message="Added to Wishlist"
+
+        closeOnTouchOutside
+
+        closeOnHardwareBackPress
+
+        showConfirmButton={false}
+
+      />
 
     </SafeAreaView>
 
@@ -177,7 +291,17 @@ const styles = StyleSheet.create({
 
     flex: 1,
 
-    backgroundColor: "#fff",
+    backgroundColor: "#f5f7fb",
+
+  },
+
+  imageContainer: {
+
+    backgroundColor: "white",
+
+    alignItems: "center",
+
+    padding: 20,
 
   },
 
@@ -185,11 +309,13 @@ const styles = StyleSheet.create({
 
     width: "100%",
 
-    height: 350,
+    height: 320,
+
+    resizeMode: "contain",
 
   },
 
-  wishlistButton: {
+  wishlist: {
 
     position: "absolute",
 
@@ -199,11 +325,23 @@ const styles = StyleSheet.create({
 
     backgroundColor: "white",
 
-    padding: 10,
+    width: 45,
 
-    borderRadius: 50,
+    height: 45,
 
-    elevation: 5,
+    borderRadius: 25,
+
+    justifyContent: "center",
+
+    alignItems: "center",
+
+    elevation: 3,
+
+  },
+
+  infoContainer: {
+
+    padding: 18,
 
   },
 
@@ -213,55 +351,218 @@ const styles = StyleSheet.create({
 
     fontWeight: "bold",
 
-    margin: 15,
+    color: "#111",
+
+  },
+
+  ratingRow: {
+
+    flexDirection: "row",
+
+    alignItems: "center",
+
+    marginTop: 12,
+
+  },
+
+  ratingBox: {
+
+    backgroundColor: "#008000",
+
+    borderRadius: 8,
+
+    paddingHorizontal: 10,
+
+    paddingVertical: 5,
+
+  },
+
+  rating: {
+
+    color: "white",
+
+    fontWeight: "bold",
+
+  },
+
+  ratingText: {
+
+    marginLeft: 10,
+
+    color: "gray",
+
+  },
+
+  priceRow: {
+
+    flexDirection: "row",
+
+    alignItems: "center",
+
+    marginTop: 16,
 
   },
 
   price: {
 
-    fontSize: 22,
+    fontSize: 30,
+
+    fontWeight: "bold",
+
+    color: "#111",
+
+  },
+
+  oldPrice: {
+
+    marginLeft: 12,
+
+    textDecorationLine:
+      "line-through",
+
+    color: "gray",
+
+    fontSize: 18,
+
+  },
+
+  discount: {
+
+    marginLeft: 12,
 
     color: "green",
 
-    marginHorizontal: 15,
+    fontWeight: "bold",
+
+    fontSize: 16,
+
+  },
+
+  offerBox: {
+
+    backgroundColor: "white",
+
+    borderRadius: 18,
+
+    padding: 18,
+
+    marginTop: 20,
+
+  },
+
+  offerTitle: {
+
+    fontSize: 18,
+
+    fontWeight: "bold",
+
+    marginBottom: 12,
+
+  },
+
+  offer: {
+
+    marginBottom: 8,
+
+    color: "#333",
+
+  },
+
+  sectionTitle: {
+
+    fontSize: 22,
+
+    fontWeight: "bold",
+
+    marginTop: 25,
+
+    marginBottom: 12,
 
   },
 
   description: {
 
-    fontSize: 16,
+    color: "#555",
 
-    margin: 15,
+    lineHeight: 22,
 
-    lineHeight: 24,
+    fontSize: 15,
 
   },
 
-  button: {
+  deliveryBox: {
 
-    backgroundColor: "#e94560",
+    backgroundColor: "white",
 
-    margin: 15,
+    borderRadius: 18,
 
-    padding: 15,
+    padding: 18,
 
-    borderRadius: 10,
+    marginTop: 25,
+
+    flexDirection: "row",
 
     alignItems: "center",
 
   },
 
+  deliveryText: {
+
+    marginLeft: 12,
+
+    fontWeight: "600",
+
+  },
+
+  bottomBar: {
+
+    backgroundColor: "white",
+
+    padding: 16,
+
+    flexDirection: "row",
+
+    justifyContent: "space-between",
+
+    borderTopLeftRadius: 24,
+
+    borderTopRightRadius: 24,
+
+    elevation: 10,
+
+  },
+
   cartButton: {
 
-    backgroundColor: "#1a1a2e",
+    flex: 1,
 
-    marginHorizontal: 15,
+    backgroundColor: "#2874f0",
 
-    marginBottom: 20,
+    marginRight: 10,
 
-    padding: 15,
+    borderRadius: 18,
 
-    borderRadius: 10,
+    paddingVertical: 16,
+
+    flexDirection: "row",
+
+    justifyContent: "center",
+
+    alignItems: "center",
+
+  },
+
+  buyButton: {
+
+    flex: 1,
+
+    backgroundColor: "#fb641b",
+
+    borderRadius: 18,
+
+    paddingVertical: 16,
+
+    justifyContent: "center",
 
     alignItems: "center",
 
@@ -271,9 +572,11 @@ const styles = StyleSheet.create({
 
     color: "white",
 
-    fontSize: 18,
-
     fontWeight: "bold",
+
+    fontSize: 16,
+
+    marginLeft: 8,
 
   },
 

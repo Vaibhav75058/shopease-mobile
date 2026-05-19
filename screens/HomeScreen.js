@@ -14,111 +14,54 @@ import {
   FlatList,
   StyleSheet,
   Image,
-  ActivityIndicator,
   TouchableOpacity,
-  TextInput,
-  ScrollView,
   Dimensions,
+  ActivityIndicator,
+  ScrollView,
 } from "react-native";
+
+import axios from "axios";
+
+import Header
+  from "../src/components/Header";
+
+import SearchBar
+  from "../src/components/SearchBar";
 
 import Ionicons
   from "@expo/vector-icons/Ionicons";
 
-import axios from "axios";
-
 const { width } =
   Dimensions.get("window");
 
-const categories = [
-  "All",
-  "Electronics",
-  "Fashion",
-  "Shoes",
-  "Mobiles",
-];
-
-const banners = [
-
-  {
-
-    id: "1",
-
-    title: "Latest Smartphones",
-
-    subtitle:
-      "Upgrade your tech today",
-
-    button: "Shop Now",
-
-    image:
-      "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9",
-
+// BANNERS WITH LOCAL ASSETS & CLICKABLE CATEGORIES
+// Note: Path '../assets/' ya '../../assets/' apne folder structure ke hisaab se adjust kar lena
+const FLIPKART_BANNERS = [
+  { 
+    id: "1", 
+    image: require('../assets/banners/electronics.png'),
+    category: "Electronics" // Ye naam aapke DB ki category se match hona chahiye
   },
-
-  {
-
-    id: "2",
-
-    title: "Fashion Sale",
-
-    subtitle:
-      "Trending styles at best prices",
-
-    button: "Shop Now",
-
-    image:
-      "https://images.unsplash.com/photo-1529139574466-a303027c1d8b",
-
+  { 
+    id: "2", 
+    image: require('../assets/banners/fashion.png'),
+    category: "Fashion" 
   },
-
-  {
-
-    id: "3",
-
-    title: "Premium Headphones",
-
-    subtitle:
-      "Feel the real sound",
-
-    button: "Shop Now",
-
-    image:
-      "https://images.unsplash.com/photo-1505740420928-5e560c06d30e",
-
+  { 
+    id: "3", 
+    image: require('../assets/banners/health.png'),
+    category: "Health" 
   },
-
-  {
-
-    id: "4",
-
-    title: "Gaming Accessories",
-
-    subtitle:
-      "Everything for gamers",
-
-    button: "Shop Now",
-
-    image:
-      "https://images.unsplash.com/photo-1542751371-adc38448a05e",
-
+  { 
+    id: "4", 
+    image: require('../assets/banners/home.png'),
+    category: "Home" 
   },
-
-  {
-
-    id: "5",
-
-    title: "Best Running Shoes",
-
-    subtitle:
-      "Comfort + Style",
-
-    button: "Shop Now",
-
-    image:
-      "https://images.unsplash.com/photo-1542291026-7eec264c27ff",
-
-  },
-
+  { 
+    id: "5", 
+    image: require('../assets/banners/skincare.png'),
+    category: "Beauty" // Agar DB me skincare hai toh yahan "Skincare" likh dena
+  }
 ];
 
 export default function HomeScreen({
@@ -128,76 +71,49 @@ export default function HomeScreen({
   const [products, setProducts] =
     useState([]);
 
-  const [
-    filteredProducts,
-    setFilteredProducts,
-  ] = useState([]);
-
   const [search, setSearch] =
     useState("");
+
+  const [loading, setLoading] =
+    useState(true);
 
   const [
     selectedCategory,
     setSelectedCategory,
   ] = useState("All");
 
-  const [loading, setLoading] =
-    useState(true);
-
-  const bannerRef = useRef(null);
-
-  const [
-    activeBanner,
-    setActiveBanner,
-  ] = useState(0);
+  // PERFECT AUTO-SCROLL REFERENCES
+  const bannerFlatListRef = useRef(null);
+  const currentBannerIndexRef = useRef(0);
+  const [activeIndex, setActiveIndex] = useState(0); 
 
   useEffect(() => {
 
-    const unsubscribe =
-      navigation.addListener(
-        "focus",
-        () => {
+    fetchProducts();
 
-          fetchProducts();
+  }, []);
 
-        }
-      );
-
-    return unsubscribe;
-
-  }, [navigation]);
-
+  // BUG-FREE AUTOMATIC BANNER SCROLL LOGIC
   useEffect(() => {
-
-    const interval = setInterval(() => {
-
-      let nextIndex =
-        activeBanner + 1;
-
-      if (
-        nextIndex >= banners.length
-      ) {
-
+    const timer = setInterval(() => {
+      let nextIndex = currentBannerIndexRef.current + 1;
+      
+      if (nextIndex >= FLIPKART_BANNERS.length) {
         nextIndex = 0;
-
       }
+      
+      currentBannerIndexRef.current = nextIndex;
+      setActiveIndex(nextIndex);
 
-      bannerRef.current?.scrollToIndex({
-
+      bannerFlatListRef.current?.scrollToIndex({
         index: nextIndex,
-
         animated: true,
-
       });
 
-      setActiveBanner(nextIndex);
+    }, 3000); 
 
-    }, 3000);
-
-    return () =>
-      clearInterval(interval);
-
-  }, [activeBanner]);
+    return () => clearInterval(timer);
+  }, []);
 
   const fetchProducts = async () => {
 
@@ -212,10 +128,6 @@ export default function HomeScreen({
 
       setProducts(response.data);
 
-      setFilteredProducts(
-        response.data
-      );
-
     } catch (error) {
 
       console.log(error);
@@ -228,74 +140,70 @@ export default function HomeScreen({
 
   };
 
-  const filterProducts = (
-    searchText,
-    category
-  ) => {
+  /* AUTO DATABASE CATEGORIES */
 
-    let filtered = products;
+  const dynamicCategories = [
 
-    if (category !== "All") {
+    "All",
 
-      filtered = filtered.filter(
+    ...new Set(
 
+      products.map(
+        (item) =>
+          item.category
+      )
+
+    ),
+
+  ];
+
+  /* FILTER PRODUCTS */
+
+  let filteredProducts =
+    [...products];
+
+  /* CATEGORY FILTER */
+
+  if (
+    selectedCategory !==
+    "All"
+  ) {
+
+    filteredProducts =
+      filteredProducts.filter(
         (item) =>
 
           item.category
-            .toLowerCase()
-            .includes(
-              category.toLowerCase()
-            )
+            ?.toLowerCase()
 
+            ===
+
+          selectedCategory
+            .toLowerCase()
       );
 
-    }
+  }
 
-    if (searchText) {
+  /* SEARCH FILTER */
 
-      filtered = filtered.filter(
+  filteredProducts =
+    filteredProducts.filter(
+      (item) =>
 
-        (item) =>
+        item.name
+          .toLowerCase()
 
-          item.name
-            .toLowerCase()
-            .includes(
-              searchText.toLowerCase()
-            )
+          .includes(
+            search.toLowerCase()
+          ) ||
 
-      );
+        item.category
+          .toLowerCase()
 
-    }
-
-    setFilteredProducts(filtered);
-
-  };
-
-  const handleSearch = (text) => {
-
-    setSearch(text);
-
-    filterProducts(
-      text,
-      selectedCategory
+          .includes(
+            search.toLowerCase()
+          )
     );
-
-  };
-
-  const handleCategory = (
-    category
-  ) => {
-
-    setSelectedCategory(
-      category
-    );
-
-    filterProducts(
-      search,
-      category
-    );
-
-  };
 
   if (loading) {
 
@@ -307,7 +215,7 @@ export default function HomeScreen({
 
         <ActivityIndicator
           size="large"
-          color="#e94560"
+          color="#2874f0"
         />
 
       </SafeAreaView>
@@ -321,6 +229,171 @@ export default function HomeScreen({
     <SafeAreaView
       style={styles.container}
     >
+
+      {/* STICKY SECTION */}
+
+      <View
+        style={styles.topSection}
+      >
+
+        <Header />
+
+        <SearchBar
+          search={search}
+          setSearch={setSearch}
+        />
+
+        {/* ROUND CATEGORIES */}
+
+        <ScrollView
+
+          horizontal
+
+          showsHorizontalScrollIndicator={
+            false
+          }
+
+          style={{
+            marginBottom: 15,
+          }}
+
+        >
+
+          {dynamicCategories.map(
+            (
+              item,
+              index
+            ) => (
+
+              <TouchableOpacity
+
+                key={index}
+
+                style={
+                  styles.categoryWrapper
+                }
+
+                onPress={() =>
+                  setSelectedCategory(
+                    item
+                  )
+                }
+
+              >
+
+                <View
+
+                  style={[
+
+                    styles.roundCategory,
+
+                    {
+
+                      backgroundColor:
+
+                        selectedCategory ===
+                        item
+
+                          ? "#2874f0"
+
+                          : "white",
+
+                    },
+
+                  ]}
+
+                >
+
+                  <Ionicons
+
+                    name={
+
+                      item
+                        .toLowerCase()
+
+                        .includes(
+                          "fashion"
+                        )
+
+                        ? "shirt-outline"
+
+                        : item
+                            .toLowerCase()
+
+                            .includes(
+                              "mobile"
+                            )
+
+                        ? "phone-portrait-outline"
+
+                        : item
+                            .toLowerCase()
+
+                            .includes(
+                              "beauty"
+                            )
+
+                        ? "sparkles-outline"
+
+                        : item
+                            .toLowerCase()
+
+                            .includes(
+                              "electronics"
+                            )
+
+                        ? "tv-outline"
+
+                        : item
+                            .toLowerCase()
+
+                            .includes(
+                              "shoe"
+                            )
+
+                        ? "walk-outline"
+
+                        : "grid-outline"
+
+                    }
+
+                    size={26}
+
+                    color={
+
+                      selectedCategory ===
+                      item
+
+                        ? "white"
+
+                        : "#111"
+
+                    }
+
+                  />
+
+                </View>
+
+                <Text
+                  style={
+                    styles.categoryText
+                  }
+                >
+
+                  {item}
+
+                </Text>
+
+              </TouchableOpacity>
+
+            )
+          )}
+
+        </ScrollView>
+
+      </View>
+
+      {/* PRODUCTS LIST */}
 
       <FlatList
 
@@ -336,301 +409,81 @@ export default function HomeScreen({
           false
         }
 
-        contentContainerStyle={{
-          paddingBottom: 120,
-        }}
-
         columnWrapperStyle={{
           justifyContent:
             "space-between",
         }}
 
+        contentContainerStyle={{
+          paddingBottom: 120,
+        }}
+
         ListHeaderComponent={
-
-          <>
-
-            <View
-              style={styles.topBar}
-            >
-
-              <Image
-
-                source={require("../assets/logo.png")}
-
-                style={
-                  styles.logoImage
-                }
-
-              />
-
-              <View
-                style={
-                  styles.rightIcons
-                }
-              >
-
-                <TouchableOpacity
-                  style={
-                    styles.iconButton
-                  }
-                >
-
-                  <Ionicons
-                    name="notifications-outline"
-                    size={26}
-                    color="#1a1a2e"
-                  />
-
-                </TouchableOpacity>
-
-                <TouchableOpacity
-
-                  style={
-                    styles.iconButton
-                  }
-
-                  onPress={() =>
-                    navigation.navigate(
-                      "Wishlist"
-                    )
-                  }
-
-                >
-
-                  <Ionicons
-                    name="heart-outline"
-                    size={26}
-                    color="#e94560"
-                  />
-
-                </TouchableOpacity>
-
-              </View>
-
-            </View>
-
-            <View
-              style={
-                styles.searchContainer
-              }
-            >
-
-              <Ionicons
-                name="search"
-                size={22}
-                color="#999"
-              />
-
-              <TextInput
-
-                placeholder="Search for products..."
-
-                placeholderTextColor="#999"
-
-                style={
-                  styles.searchInput
-                }
-
-                value={search}
-
-                onChangeText={
-                  handleSearch
-                }
-
-              />
-
-            </View>
-
-            <ScrollView
-
-              horizontal
-
-              showsHorizontalScrollIndicator={
-                false
-              }
-
-              style={
-                styles.categoryContainer
-              }
-
-            >
-
-              {categories.map(
-                (category) => (
-
-                  <TouchableOpacity
-
-                    key={category}
-
-                    style={[
-
-                      styles.categoryButton,
-
-                      selectedCategory ===
-                      category &&
-
-                      styles.activeCategory,
-
-                    ]}
-
-                    onPress={() =>
-                      handleCategory(
-                        category
-                      )
-                    }
-
-                  >
-
-                    <Text
-
-                      style={[
-
-                        styles.categoryText,
-
-                        selectedCategory ===
-                        category && {
-
-                          color:
-                            "white",
-
-                        },
-
-                      ]}
-
-                    >
-
-                      {category}
-
-                    </Text>
-
-                  </TouchableOpacity>
-
-                )
-              )}
-
-            </ScrollView>
-
+          <View style={styles.bannerContainer}>
             <FlatList
-
-              ref={bannerRef}
-
-              data={banners}
-
+              ref={bannerFlatListRef}
+              data={FLIPKART_BANNERS}
+              keyExtractor={(item) => item.id}
               horizontal
-
               pagingEnabled
-
-              snapToInterval={width - 15}
-
-              snapToAlignment="start"
-
-              decelerationRate="fast"
-              showsHorizontalScrollIndicator={
-                false
-              }
-
-              keyExtractor={(item) =>
-                item.id
-              }
-
-              style={
-                styles.bannerContainer
-              }
-
-              onMomentumScrollEnd={(
-                event
-              ) => {
-
-                const index =
-                  Math.round(
-
-                    event.nativeEvent
-                      .contentOffset.x /
-                    (width - 35)
-
-                  );
-
-                setActiveBanner(
-                  index
-                );
-
+              showsHorizontalScrollIndicator={false}
+              getItemLayout={(_, index) => ({
+                length: width - 30,
+                offset: (width - 30) * index,
+                index,
+              })}
+              onMomentumScrollEnd={(event) => {
+                const index = Math.round(event.nativeEvent.contentOffset.x / (width - 30));
+                currentBannerIndexRef.current = index;
+                setActiveIndex(index);
               }}
-
-              renderItem={({
-                item,
-              }) => (
-
-                <View
-                  style={
-                    styles.modernBanner
-                  }
+              renderItem={({ item }) => (
+                // YAHAN VIEW KO HATAKAR TOUCHABLE OPACITY KAR DIYA HAI
+                <TouchableOpacity 
+                  activeOpacity={0.9} // Click ka halka sa feel aane ke liye
+                  style={styles.bannerWrapper}
+                  onPress={() => setSelectedCategory(item.category)} // Click krte hi category filter hogi
                 >
-
-                  <View
-                    style={
-                      styles.bannerLeft
-                    }
-                  >
-
-                    <Text
-                      style={
-                        styles.bannerTitle
-                      }
-                    >
-
-                      {item.title}
-
-                    </Text>
-
-                    <Text
-                      style={
-                        styles.bannerSubtitle
-                      }
-                    >
-
-                      {item.subtitle}
-
-                    </Text>
-
-                    <TouchableOpacity
-                      style={
-                        styles.shopButton
-                      }
-                    >
-
-                      <Text
-                        style={
-                          styles.shopButtonText
-                        }
-                      >
-
-                        {item.button}
-
-                      </Text>
-
-                    </TouchableOpacity>
-
-                  </View>
-
                   <Image
-
-                    source={{
-                      uri: item.image,
-                    }}
-
-                    style={
-                      styles.bannerImage
-                    }
-
+                    source={item.image} // 'uri' Hata kar direct source diya local ke liye
+                    style={styles.bannerImage}
+                    resizeMode="cover"
                   />
-
-                </View>
-
+                </TouchableOpacity>
               )}
+            />
+            {/* DOT INDICATORS */}
+            <View style={styles.dotContainer}>
+              {FLIPKART_BANNERS.map((_, index) => (
+                <View
+                  key={index}
+                  style={[
+                    styles.dot,
+                    { backgroundColor: activeIndex === index ? "#2874f0" : "#ccc" },
+                  ]}
+                />
+              ))}
+            </View>
+          </View>
+        }
 
+        ListEmptyComponent={
+
+          <View
+            style={styles.emptyBox}
+          >
+
+            <Ionicons
+              name="search"
+              size={80}
+              color="#ccc"
             />
 
-          </>
+            <Text style={styles.emptyText}>
+              No products found
+            </Text>
+
+          </View>
 
         }
 
@@ -638,15 +491,20 @@ export default function HomeScreen({
 
           <TouchableOpacity
 
-            style={styles.gridCard}
+            style={styles.card}
 
             onPress={() =>
+
               navigation.navigate(
+
                 "ProductDetails",
+
                 {
                   product: item,
                 }
+
               )
+
             }
 
           >
@@ -657,38 +515,25 @@ export default function HomeScreen({
                 uri: item.image,
               }}
 
-              style={styles.gridImage}
+              style={styles.image}
 
             />
 
             <Text
-
               numberOfLines={1}
-
-              style={styles.gridName}
-
+              style={styles.name}
             >
 
               {item.name}
 
             </Text>
 
-            <Text
-              style={
-                styles.gridCategory
-              }
-            >
-
+            <Text style={styles.category}>
               {item.category}
-
             </Text>
 
-            <Text
-              style={styles.gridPrice}
-            >
-
+            <Text style={styles.price}>
               ₹ {item.price}
-
             </Text>
 
           </TouchableOpacity>
@@ -709,10 +554,52 @@ const styles = StyleSheet.create({
 
     flex: 1,
 
-    backgroundColor: "#f7f7f7",
+    backgroundColor: "#f5f7fb",
 
     paddingHorizontal: 15,
 
+  },
+
+  topSection: {
+
+    backgroundColor: "#f5f7fb",
+
+    paddingTop: 5,
+
+    zIndex: 999,
+
+  },
+
+  bannerContainer: {
+    marginVertical: 10,
+    width: '100%',
+    alignItems: 'center',
+  },
+
+  bannerWrapper: {
+    width: width - 30, // Screen width minus padding
+    height: 170,       // Fixed ratio for all banners
+    borderRadius: 14,
+    overflow: 'hidden',
+  },
+
+  bannerImage: {
+    width: '100%',
+    height: '100%',
+  },
+
+  dotContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 8,
+  },
+
+  dot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    marginHorizontal: 4,
   },
 
   loader: {
@@ -723,239 +610,37 @@ const styles = StyleSheet.create({
 
     alignItems: "center",
 
-    backgroundColor: "#fff",
-
   },
 
-  topBar: {
+  card: {
 
-    flexDirection: "row",
-
-    justifyContent: "space-between",
-
-    alignItems: "center",
-
-    marginTop: 10,
-
-    marginBottom: 20,
-
-  },
-
-  logoImage: {
-
-    width: 190,
-
-    height: 60,
-
-    resizeMode: "contain",
-
-  },
-
-  rightIcons: {
-
-    flexDirection: "row",
-
-    alignItems: "center",
-
-  },
-
-  iconButton: {
-
-    marginLeft: 15,
-
-  },
-
-  searchContainer: {
-
-    flexDirection: "row",
-
-    alignItems: "center",
+    width: (width - 40) / 2,
 
     backgroundColor: "white",
 
     borderRadius: 18,
 
-    paddingHorizontal: 15,
+    padding: 10,
 
-    height: 58,
-
-    marginBottom: 18,
+    marginBottom: 16,
 
     elevation: 3,
 
   },
 
-  searchInput: {
-
-    flex: 1,
-
-    marginLeft: 10,
-
-    fontSize: 16,
-
-    color: "#1a1a2e",
-
-  },
-
-  categoryContainer: {
-
-    marginBottom: 20,
-
-  },
-
-  categoryButton: {
-
-    backgroundColor: "white",
-
-    paddingVertical: 11,
-
-    paddingHorizontal: 20,
-
-    borderRadius: 30,
-
-    marginRight: 10,
-
-    elevation: 2,
-
-  },
-
-  activeCategory: {
-
-    backgroundColor: "#e94560",
-
-  },
-
-  categoryText: {
-
-    fontWeight: "600",
-
-    color: "#1a1a2e",
-
-  },
-
-  bannerContainer: {
-
-    marginBottom: 25,
-
-  },
-
-  modernBanner: {
-
-    width: width - 30,
-
-    height: 210,
-
-    backgroundColor: "#1a1a2e",
-
-    borderRadius: 28,
-
-    marginRight: 15,
-
-    padding: 22,
-
-    flexDirection: "row",
-
-    alignItems: "center",
-
-    justifyContent: "space-between",
-
-    elevation: 6,
-
-  },
-
-  bannerLeft: {
-
-    flex: 1,
-
-  },
-
-  bannerTitle: {
-
-    fontSize: 26,
-
-    fontWeight: "bold",
-
-    color: "white",
-
-  },
-
-  bannerSubtitle: {
-
-    fontSize: 15,
-
-    color: "#ddd",
-
-    marginTop: 8,
-
-    marginBottom: 18,
-
-  },
-
-  shopButton: {
-
-    backgroundColor: "#e94560",
-
-    paddingVertical: 12,
-
-    paddingHorizontal: 20,
-
-    borderRadius: 14,
-
-    alignSelf: "flex-start",
-
-  },
-
-  shopButtonText: {
-
-    color: "white",
-
-    fontWeight: "bold",
-
-    fontSize: 15,
-
-  },
-
-  bannerImage: {
-
-    width: 125,
-
-    height: 125,
-
-    borderRadius: 20,
-
-    resizeMode: "cover",
-
-  },
-
-  gridCard: {
-
-    width: (width - 42) / 2,
-
-    backgroundColor: "white",
-
-    borderRadius: 22,
-
-    padding: 10,
-
-    marginBottom: 18,
-
-    elevation: 4,
-
-  },
-
-  gridImage: {
+  image: {
 
     width: "100%",
 
-    height: 170,
+    height: 160,
 
-    borderRadius: 18,
+    borderRadius: 14,
 
     resizeMode: "cover",
 
   },
 
-  gridName: {
+  name: {
 
     fontSize: 16,
 
@@ -963,13 +648,11 @@ const styles = StyleSheet.create({
 
     marginTop: 10,
 
-    color: "#1a1a2e",
+    color: "#111",
 
   },
 
-  gridCategory: {
-
-    fontSize: 13,
+  category: {
 
     color: "gray",
 
@@ -977,15 +660,71 @@ const styles = StyleSheet.create({
 
   },
 
-  gridPrice: {
+  price: {
 
-    fontSize: 18,
-
-    color: "#e94560",
+    color: "#2874f0",
 
     fontWeight: "bold",
 
+    fontSize: 18,
+
     marginTop: 8,
+
+  },
+
+  emptyBox: {
+
+    alignItems: "center",
+
+    marginTop: 60,
+
+  },
+
+  emptyText: {
+
+    marginTop: 18,
+
+    fontSize: 22,
+
+    fontWeight: "bold",
+
+    color: "#999",
+
+  },
+
+  categoryWrapper: {
+
+    alignItems: "center",
+
+    marginRight: 18,
+
+  },
+
+  roundCategory: {
+
+    width: 58,
+
+    height: 58,
+
+    borderRadius: 50,
+
+    justifyContent: "center",
+
+    alignItems: "center",
+
+    elevation: 3,
+
+  },
+
+  categoryText: {
+
+    marginTop: 8,
+
+    fontWeight: "500",
+
+    color: "#111",
+
+    fontSize: 12,
 
   },
 

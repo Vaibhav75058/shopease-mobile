@@ -3,180 +3,146 @@ import React, {
   useState,
 } from "react";
 
+import axios from "axios";
+
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  ActivityIndicator,
+} from "react-native";
+
 import {
   SafeAreaView,
 } from "react-native-safe-area-context";
 
 import {
-  View,
-  Text,
-  FlatList,
-  TouchableOpacity,
-  StyleSheet,
-  Alert,
-  ScrollView,
-} from "react-native";
-
-import axios from "axios";
-
-import { useAuth } from "../src/context/AuthContext";
+  useAuth,
+} from "../src/context/AuthContext";
 
 export default function AdminDashboardScreen() {
 
-  const { user } = useAuth();
+  const auth =
+    useAuth();
 
-  const [products, setProducts] = useState([]);
+  const user =
+    auth?.user;
 
-  const [orders, setOrders] = useState([]);
+  const [
+    loading,
+    setLoading,
+  ] = useState(true);
 
-  const [users, setUsers] = useState([]);
+  const [
+    users,
+    setUsers,
+  ] = useState([]);
+
+  const [
+    products,
+    setProducts,
+  ] = useState([]);
+
+  const [
+    orders,
+    setOrders,
+  ] = useState([]);
 
   useEffect(() => {
 
-    fetchData();
+    fetchAdminData();
 
   }, []);
 
-  const config = {
+  const fetchAdminData =
+    async () => {
 
-    headers: {
+      try {
 
-      Authorization:
-        `Bearer ${user.token}`,
+        const config = {
 
-    },
+          headers: {
 
-  };
+            Authorization:
+              `Bearer ${user.token}`,
 
-  const fetchData = async () => {
+          },
 
-    try {
+        };
 
-      const productRes =
-        await axios.get(
-          "https://e-commerce-mern-stack-0okr.onrender.com/api/products"
+        const usersRes =
+          await axios.get(
+
+            "https://e-commerce-mern-stack-0okr.onrender.com/api/users",
+
+            config
+
+          );
+
+        const productsRes =
+          await axios.get(
+
+            "https://e-commerce-mern-stack-0okr.onrender.com/api/products"
+
+          );
+
+        const ordersRes =
+          await axios.get(
+
+            "https://e-commerce-mern-stack-0okr.onrender.com/api/orders",
+
+            config
+
+          );
+
+        setUsers(
+          usersRes.data
         );
 
-      const orderRes =
-        await axios.get(
-          "https://e-commerce-mern-stack-0okr.onrender.com/api/orders",
-          config
+        setProducts(
+          productsRes.data
         );
 
-      const userRes =
-        await axios.get(
-          "https://e-commerce-mern-stack-0okr.onrender.com/api/users",
-          config
+        setOrders(
+          ordersRes.data
         );
 
-      setProducts(productRes.data);
+      } catch (error) {
 
-      setOrders(orderRes.data);
+        console.log(error);
 
-      setUsers(userRes.data);
+      } finally {
 
-    } catch (error) {
+        setLoading(false);
 
-      console.log(error);
+      }
 
-    }
+    };
 
-  };
+  const totalRevenue =
+    orders.reduce(
 
-  const deleteProduct = async (id) => {
+      (acc, item) =>
 
-    try {
+        acc + item.totalPrice,
 
-      await axios.delete(
+      0
 
-        `https://e-commerce-mern-stack-0okr.onrender.com/api/products/${id}`,
+    );
 
-        config
-
-      );
-
-      Alert.alert(
-        "Success",
-        "Product Deleted"
-      );
-
-      fetchData();
-
-    } catch (error) {
-
-      console.log(error);
-
-    }
-
-  };
-
-  const deleteUser = async (id) => {
-
-    try {
-
-      await axios.delete(
-
-        `https://e-commerce-mern-stack-0okr.onrender.com/api/users/${id}`,
-
-        config
-
-      );
-
-      Alert.alert(
-        "Success",
-        "User Deleted"
-      );
-
-      fetchData();
-
-    } catch (error) {
-
-      console.log(error);
-
-    }
-
-  };
-
-  const markDelivered = async (id) => {
-
-    try {
-
-      await axios.put(
-
-        `https://e-commerce-mern-stack-0okr.onrender.com/api/orders/${id}/deliver`,
-
-        {},
-
-        config
-
-      );
-
-      Alert.alert(
-        "Success",
-        "Order Delivered"
-      );
-
-      fetchData();
-
-    } catch (error) {
-
-      console.log(error);
-
-    }
-
-  };
-
-  if (!user?.isAdmin) {
+  if (loading) {
 
     return (
 
       <SafeAreaView
-        style={styles.center}
+        style={styles.loader}
       >
 
-        <Text style={styles.notAdmin}>
-          Admin Access Only
-        </Text>
+        <ActivityIndicator
+          size="large"
+          color="#2874f0"
+        />
 
       </SafeAreaView>
 
@@ -190,165 +156,106 @@ export default function AdminDashboardScreen() {
       style={styles.container}
     >
 
-      <ScrollView>
+      <ScrollView
+        showsVerticalScrollIndicator={
+          false
+        }
+      >
 
         <Text style={styles.heading}>
           Admin Dashboard
         </Text>
 
-        <View style={styles.statsContainer}>
+        {/* STATS */}
 
-          <View style={styles.statCard}>
-            <Text style={styles.statNumber}>
-              {products.length}
-            </Text>
-            <Text>Products</Text>
-          </View>
+        <View style={styles.grid}>
 
-          <View style={styles.statCard}>
-            <Text style={styles.statNumber}>
-              {orders.length}
-            </Text>
-            <Text>Orders</Text>
-          </View>
+          <View style={styles.card}>
 
-          <View style={styles.statCard}>
-            <Text style={styles.statNumber}>
+            <Text style={styles.number}>
               {users.length}
             </Text>
-            <Text>Users</Text>
+
+            <Text style={styles.label}>
+              Users
+            </Text>
+
+          </View>
+
+          <View style={styles.card}>
+
+            <Text style={styles.number}>
+              {products.length}
+            </Text>
+
+            <Text style={styles.label}>
+              Products
+            </Text>
+
+          </View>
+
+          <View style={styles.card}>
+
+            <Text style={styles.number}>
+              {orders.length}
+            </Text>
+
+            <Text style={styles.label}>
+              Orders
+            </Text>
+
+          </View>
+
+          <View style={styles.card}>
+
+            <Text style={styles.number}>
+              ₹ {totalRevenue}
+            </Text>
+
+            <Text style={styles.label}>
+              Revenue
+            </Text>
+
           </View>
 
         </View>
 
-        <Text style={styles.section}>
-          Products
+        {/* RECENT ORDERS */}
+
+        <Text style={styles.subHeading}>
+          Recent Orders
         </Text>
 
-        {products.map((item) => (
+        {orders.slice(0, 5).map(
+          (item) => (
 
-          <View
-            key={item._id}
-            style={styles.card}
-          >
-
-            <Text style={styles.name}>
-              {item.name}
-            </Text>
-
-            <Text>
-              ₹ {item.price}
-            </Text>
-
-            <TouchableOpacity
-
-              style={styles.deleteButton}
-
-              onPress={() =>
-                deleteProduct(item._id)
-              }
-
+            <View
+              key={item._id}
+              style={styles.orderCard}
             >
 
-              <Text style={styles.buttonText}>
-                Delete Product
+              <Text
+                style={styles.orderId}
+              >
+                {item._id}
               </Text>
 
-            </TouchableOpacity>
-
-          </View>
-
-        ))}
-
-        <Text style={styles.section}>
-          Orders
-        </Text>
-
-        {orders.map((item) => (
-
-          <View
-            key={item._id}
-            style={styles.card}
-          >
-
-            <Text style={styles.name}>
-              {item._id.slice(-6)}
-            </Text>
-
-            <Text>
-              ₹ {item.totalPrice}
-            </Text>
-
-            <Text>
-              {item.status}
-            </Text>
-
-            {!item.isDelivered && (
-
-              <TouchableOpacity
-
-                style={styles.deliverButton}
-
-                onPress={() =>
-                  markDelivered(item._id)
-                }
-
+              <Text
+                style={styles.orderPrice}
               >
+                ₹ {item.totalPrice}
+              </Text>
 
-                <Text style={styles.buttonText}>
-                  Mark Delivered
-                </Text>
-
-              </TouchableOpacity>
-
-            )}
-
-          </View>
-
-        ))}
-
-        <Text style={styles.section}>
-          Users
-        </Text>
-
-        {users.map((item) => (
-
-          <View
-            key={item._id}
-            style={styles.card}
-          >
-
-            <Text style={styles.name}>
-              {item.name}
-            </Text>
-
-            <Text>
-              {item.email}
-            </Text>
-
-            {!item.isAdmin && (
-
-              <TouchableOpacity
-
-                style={styles.deleteButton}
-
-                onPress={() =>
-                  deleteUser(item._id)
-                }
-
+              <Text
+                style={styles.orderStatus}
               >
+                {item.status}
+              </Text>
 
-                <Text style={styles.buttonText}>
-                  Delete User
-                </Text>
+            </View>
 
-              </TouchableOpacity>
-
-            )}
-
-          </View>
-
-        ))}
+          )
+        )}
 
       </ScrollView>
 
@@ -364,15 +271,28 @@ const styles = StyleSheet.create({
 
     flex: 1,
 
-    backgroundColor: "#fff",
+    backgroundColor:
+      "#f5f7fb",
 
     padding: 15,
 
   },
 
+  loader: {
+
+    flex: 1,
+
+    justifyContent:
+      "center",
+
+    alignItems:
+      "center",
+
+  },
+
   heading: {
 
-    fontSize: 32,
+    fontSize: 28,
 
     fontWeight: "bold",
 
@@ -380,125 +300,100 @@ const styles = StyleSheet.create({
 
   },
 
-  statsContainer: {
+  grid: {
 
     flexDirection: "row",
 
-    justifyContent: "space-between",
+    flexWrap: "wrap",
 
-    marginBottom: 25,
-
-  },
-
-  statCard: {
-
-    backgroundColor: "#f5f5f5",
-
-    padding: 20,
-
-    borderRadius: 15,
-
-    alignItems: "center",
-
-    width: "31%",
-
-  },
-
-  statNumber: {
-
-    fontSize: 26,
-
-    fontWeight: "bold",
-
-    color: "#e94560",
-
-  },
-
-  section: {
-
-    fontSize: 24,
-
-    fontWeight: "bold",
-
-    marginBottom: 15,
-
-    marginTop: 15,
+    justifyContent:
+      "space-between",
 
   },
 
   card: {
 
-    backgroundColor: "#f5f5f5",
+    width: "48%",
 
-    padding: 15,
+    backgroundColor:
+      "white",
 
-    borderRadius: 12,
+    borderRadius: 20,
 
-    marginBottom: 15,
+    padding: 24,
+
+    marginBottom: 16,
+
+    elevation: 3,
 
   },
 
-  name: {
+  number: {
 
-    fontSize: 18,
+    fontSize: 28,
 
     fontWeight: "bold",
 
-    marginBottom: 5,
+    color: "#2874f0",
 
   },
 
-  deleteButton: {
+  label: {
 
-    backgroundColor: "red",
+    color: "gray",
 
-    padding: 12,
-
-    borderRadius: 10,
-
-    marginTop: 10,
-
-    alignItems: "center",
+    marginTop: 8,
 
   },
 
-  deliverButton: {
+  subHeading: {
 
-    backgroundColor: "green",
-
-    padding: 12,
-
-    borderRadius: 10,
-
-    marginTop: 10,
-
-    alignItems: "center",
-
-  },
-
-  buttonText: {
-
-    color: "white",
+    fontSize: 22,
 
     fontWeight: "bold",
 
-  },
-
-  center: {
-
-    flex: 1,
-
-    justifyContent: "center",
-
-    alignItems: "center",
+    marginVertical: 20,
 
   },
 
-  notAdmin: {
+  orderCard: {
 
-    fontSize: 24,
+    backgroundColor:
+      "white",
+
+    padding: 18,
+
+    borderRadius: 18,
+
+    marginBottom: 14,
+
+  },
+
+  orderId: {
+
+    color: "gray",
+
+    fontSize: 12,
+
+  },
+
+  orderPrice: {
+
+    fontSize: 22,
 
     fontWeight: "bold",
+
+    marginTop: 8,
+
+  },
+
+  orderStatus: {
+
+    color: "green",
+
+    fontWeight: "bold",
+
+    marginTop: 8,
 
   },
 

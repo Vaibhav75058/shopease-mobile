@@ -2,9 +2,21 @@ import "react-native-gesture-handler";
 
 import React from "react";
 
+import {
+
+  NotificationProvider,
+
+} from "./src/context/NotificationContext";
+
+import CategoriesScreen
+  from "./screens/CategoriesScreen";
+
 import WishlistScreen
   from "./screens/WishlistScreen";
 
+import NotificationsScreen
+from "./screens/NotificationsScreen";
+  
 import {
   View,
   TouchableOpacity,
@@ -25,9 +37,7 @@ import {
 import {
   createBottomTabNavigator,
 } from "@react-navigation/bottom-tabs";
-import {
-  Ionicons
-} from "@expo/vector-icons";
+
 import Ionicons
   from "@expo/vector-icons/Ionicons";
 
@@ -49,9 +59,6 @@ import CartScreen
 import ProfileScreen
   from "./screens/ProfileScreen";
 
-import MyOrdersScreen
-  from "./screens/MyOrdersScreen";
-
 import CheckoutScreen
   from "./screens/CheckoutScreen";
 
@@ -60,7 +67,10 @@ import ChatBotScreen
 
 import AdminNavigator
   from "./screens/admin/AdminNavigator";
-
+import AdminDashboardScreen
+  from "./screens/AdminDashboardScreen";
+import MyOrdersScreen
+  from "./screens/MyOrdersScreen";
 import {
   AuthProvider,
   useAuth,
@@ -79,6 +89,7 @@ const Tab =
 
 function BottomTabs({
   navigation,
+
 }) {
 
   const cart = useCart();
@@ -103,6 +114,34 @@ function BottomTabs({
 
           headerShown: false,
 
+          tabBarStyle: {
+
+            height: 70,
+
+            paddingBottom: 8,
+
+            paddingTop: 8,
+
+            borderTopLeftRadius: 18,
+
+            borderTopRightRadius: 18,
+
+            backgroundColor: "white",
+
+            position: "absolute",
+
+            elevation: 10,
+
+          },
+
+          tabBarLabelStyle: {
+
+            fontSize: 12,
+
+            fontWeight: "600",
+
+          },
+
           tabBarIcon: ({
             color,
             size,
@@ -117,19 +156,19 @@ function BottomTabs({
               iconName = "home";
 
             } else if (
+              route.name === "Categories"
+            ) {
+
+              iconName = "grid";
+
+            } else if (
               route.name === "Cart"
             ) {
 
               iconName = "cart";
 
             } else if (
-              route.name === "Orders"
-            ) {
-
-              iconName = "bag";
-
-            } else if (
-              route.name === "Profile"
+              route.name === "Account"
             ) {
 
               iconName = "person";
@@ -147,7 +186,7 @@ function BottomTabs({
 
               <Ionicons
                 name={iconName}
-                size={size}
+                size={24}
                 color={color}
               />
 
@@ -156,7 +195,7 @@ function BottomTabs({
           },
 
           tabBarActiveTintColor:
-            "#e94560",
+            "#2874f0",
 
           tabBarInactiveTintColor:
             "gray",
@@ -168,6 +207,14 @@ function BottomTabs({
         <Tab.Screen
           name="Home"
           component={HomeScreen}
+          listeners={{
+            tabPress: () => { },
+          }}
+        />
+
+        <Tab.Screen
+          name="Categories"
+          component={CategoriesScreen}
         />
 
         <Tab.Screen
@@ -188,17 +235,8 @@ function BottomTabs({
         />
 
         <Tab.Screen
-          name="Orders"
-          component={
-            MyOrdersScreen
-          }
-        />
-
-        <Tab.Screen
-          name="Profile"
-          component={
-            ProfileScreen
-          }
+          name="Account"
+          component={ProfileScreen}
         />
 
         {user?.isAdmin && (
@@ -214,52 +252,57 @@ function BottomTabs({
 
       </Tab.Navigator>
 
-      <TouchableOpacity
 
-        style={{
 
-          position:
-            "absolute",
+      {
+        navigation
+          ?.getState()
+          ?.routes?.[
+          navigation.getState().index
+        ]?.state?.index === 0 && (
 
-          bottom: 90,
+          <TouchableOpacity
 
-          right: 20,
+            style={{
 
-          backgroundColor:
-            "#e94560",
+              position: "absolute",
 
-          width: 65,
+              bottom: 90,
 
-          height: 65,
+              right: 20,
 
-          borderRadius: 40,
+              backgroundColor: "#2874f0",
 
-          justifyContent:
-            "center",
+              width: 65,
 
-          alignItems:
-            "center",
+              height: 65,
 
-          elevation: 10,
+              borderRadius: 40,
 
-        }}
+              justifyContent: "center",
 
-        onPress={() =>
-          navigation.navigate(
-            "ChatBot"
-          )
-        }
+              alignItems: "center",
 
-      >
+              elevation: 10,
 
-        <Ionicons
-          name="chatbubble"
-          size={30}
-          color="white"
-        />
+            }}
 
-      </TouchableOpacity>
+            onPress={() =>
+              navigation.navigate("ChatBot")
+            }
 
+          >
+
+            <Ionicons
+              name="chatbubble"
+              size={30}
+              color="white"
+            />
+
+          </TouchableOpacity>
+
+        )
+      }
     </View>
 
   );
@@ -304,7 +347,7 @@ function MainNavigator() {
 
           <Stack.Screen
 
-            name="Main"
+            name="Home"
 
             component={
               BottomTabs
@@ -344,7 +387,33 @@ function MainNavigator() {
               WishlistScreen
             }
           />
+          <Stack.Screen
 
+            name="Notifications"
+
+            component={
+              NotificationsScreen
+            }
+
+          />
+          <Stack.Screen
+
+            name="MyOrders"
+
+            component={
+              MyOrdersScreen
+            }
+
+          />
+          <Stack.Screen
+
+            name="AdminDashboard"
+
+            component={
+              AdminDashboardScreen
+            }
+
+          />
         </>
 
       ) : (
@@ -394,25 +463,31 @@ function MainNavigator() {
 export default function App() {
 
   return (
+    <NotificationProvider>
+      <AuthProvider>
 
-    <AuthProvider>
+        <WishlistProvider>
 
-      <WishlistProvider>
+          <CartProvider>
 
-        <CartProvider>
+            <NavigationContainer>
 
-          <NavigationContainer>
+              <>
 
-            <MainNavigator />
+                <MainNavigator />
 
-          </NavigationContainer>
 
-        </CartProvider>
 
-      </WishlistProvider>
+              </>
 
-    </AuthProvider>
+            </NavigationContainer>
 
+          </CartProvider>
+
+        </WishlistProvider>
+
+      </AuthProvider>
+    </NotificationProvider>
   );
 
 }

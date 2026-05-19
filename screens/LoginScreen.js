@@ -12,6 +12,7 @@ import {
   TouchableOpacity,
   StyleSheet,
   Alert,
+  ActivityIndicator,
 } from "react-native";
 
 import axios from "axios";
@@ -26,9 +27,13 @@ export default function LoginScreen({ navigation }) {
 
   const [password, setPassword] = useState("");
 
+  const [loading, setLoading] = useState(false);
+
   const handleLogin = async () => {
 
     try {
+
+      setLoading(true);
 
       const response = await axios.post(
 
@@ -43,8 +48,6 @@ export default function LoginScreen({ navigation }) {
 
       await login(response.data);
 
-
-
     } catch (error) {
 
       console.log(error);
@@ -53,6 +56,10 @@ export default function LoginScreen({ navigation }) {
         "Error",
         "Invalid Credentials"
       );
+
+    } finally {
+
+      setLoading(false);
 
     }
 
@@ -76,10 +83,6 @@ export default function LoginScreen({ navigation }) {
 
         />
 
-        {/* <Text style={styles.heading}>
-          Welcome Back
-        </Text> */}
-
         <TextInput
           placeholder="Email"
           value={email}
@@ -96,13 +99,32 @@ export default function LoginScreen({ navigation }) {
         />
 
         <TouchableOpacity
-          style={styles.button}
+          style={[
+            styles.button,
+            loading && {
+              opacity: 0.7,
+            },
+          ]}
           onPress={handleLogin}
+          disabled={loading}
         >
 
-          <Text style={styles.buttonText}>
-            Login
-          </Text>
+          {
+            loading ? (
+
+              <ActivityIndicator
+                color="white"
+                size="small"
+              />
+
+            ) : (
+
+              <Text style={styles.buttonText}>
+                Login
+              </Text>
+
+            )
+          }
 
         </TouchableOpacity>
 
@@ -229,4 +251,5 @@ const styles = StyleSheet.create({
     marginBottom: 15,
 
   },
+
 });

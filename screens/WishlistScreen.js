@@ -1,20 +1,28 @@
 import React from "react";
 
 import {
-  SafeAreaView,
-} from "react-native-safe-area-context";
-
-import {
   View,
   Text,
+  StyleSheet,
   FlatList,
   Image,
-  StyleSheet,
   TouchableOpacity,
 } from "react-native";
 
-import { useWishlist }
-  from "../src/context/WishlistContext";
+import {
+  SafeAreaView,
+} from "react-native-safe-area-context";
+
+import Ionicons
+  from "@expo/vector-icons/Ionicons";
+
+import {
+  useWishlist,
+} from "../src/context/WishlistContext";
+
+import {
+  useCart,
+} from "../src/context/CartContext";
 
 export default function WishlistScreen({
 
@@ -22,90 +30,165 @@ export default function WishlistScreen({
 
 }) {
 
-  const {
-    wishlistItems,
-  } = useWishlist();
+  const wishlist =
+    useWishlist();
+
+  const wishlistItems =
+    wishlist?.wishlistItems || [];
+
+  const removeFromWishlist =
+    wishlist?.removeFromWishlist;
+
+  const cart = useCart();
+
+  const addToCart =
+    cart?.addToCart;
+
+  if (
+    wishlistItems.length === 0
+  ) {
+
+    return (
+
+      <SafeAreaView
+        style={styles.emptyContainer}
+      >
+
+        <Ionicons
+          name="heart-outline"
+          size={100}
+          color="#ccc"
+        />
+
+        <Text style={styles.emptyText}>
+          Wishlist is empty
+        </Text>
+
+      </SafeAreaView>
+
+    );
+
+  }
 
   return (
 
     <SafeAreaView
+      edges={["top"]}
       style={styles.container}
     >
 
-      <Text style={styles.heading}>
-        My Wishlist ❤️
-      </Text>
+      <FlatList
 
-      {wishlistItems.length === 0 ? (
+        data={wishlistItems}
 
-        <View style={styles.emptyBox}>
+        keyExtractor={(item) =>
+          item._id
+        }
 
-          <Text style={styles.emptyText}>
-            Wishlist is Empty 😄
-          </Text>
+        showsVerticalScrollIndicator={
+          false
+        }
 
-        </View>
+        contentContainerStyle={{
+          padding: 15,
+          paddingBottom: 100,
+        }}
 
-      ) : (
+        renderItem={({ item }) => (
 
-        <FlatList
+          <TouchableOpacity
 
-          data={wishlistItems}
+            style={styles.card}
 
-          keyExtractor={(item) => item._id}
+            onPress={() =>
+              navigation.navigate(
+                "ProductDetails",
+                {
+                  product: item,
+                }
+              )
+            }
 
-          numColumns={2}
+          >
 
-          columnWrapperStyle={{
-            justifyContent:
-              "space-between",
-          }}
+            <Image
 
-          renderItem={({ item }) => (
+              source={{
+                uri: item.image,
+              }}
 
-            <TouchableOpacity
+              style={styles.image}
 
-              style={styles.card}
+            />
 
-              onPress={() =>
-
-                navigation.navigate(
-
-                  "ProductDetails",
-
-                  { product: item }
-
-                )
-
-              }
-
-            >
-
-              <Image
-                source={{
-                  uri: item.image,
-                }}
-                style={styles.image}
-              />
+            <View style={styles.info}>
 
               <Text
                 numberOfLines={1}
                 style={styles.name}
               >
+
                 {item.name}
+
               </Text>
 
               <Text style={styles.price}>
                 ₹ {item.price}
               </Text>
 
-            </TouchableOpacity>
+              <View style={styles.actions}>
 
-          )}
+                <TouchableOpacity
 
-        />
+                  style={styles.cartButton}
 
-      )}
+                  onPress={() =>
+                    addToCart(item)
+                  }
+
+                >
+
+                  <Text
+                    style={
+                      styles.cartText
+                    }
+                  >
+                    Add to Cart
+                  </Text>
+
+                </TouchableOpacity>
+
+                <TouchableOpacity
+
+                  style={
+                    styles.removeButton
+                  }
+
+                  onPress={() =>
+                    removeFromWishlist(
+                      item._id
+                    )
+                  }
+
+                >
+
+                  <Ionicons
+                    name="trash-outline"
+                    size={22}
+                    color="#e94560"
+                  />
+
+                </TouchableOpacity>
+
+              </View>
+
+            </View>
+
+          </TouchableOpacity>
+
+        )}
+
+      />
 
     </SafeAreaView>
 
@@ -119,23 +202,11 @@ const styles = StyleSheet.create({
 
     flex: 1,
 
-    backgroundColor: "#fff",
-
-    padding: 15,
+    backgroundColor: "#f5f7fb",
 
   },
 
-  heading: {
-
-    fontSize: 28,
-
-    fontWeight: "bold",
-
-    marginBottom: 20,
-
-  },
-
-  emptyBox: {
+  emptyContainer: {
 
     flex: 1,
 
@@ -143,59 +214,116 @@ const styles = StyleSheet.create({
 
     alignItems: "center",
 
+    backgroundColor: "white",
+
   },
 
   emptyText: {
+
+    marginTop: 20,
 
     fontSize: 22,
 
     fontWeight: "bold",
 
+    color: "#888",
+
   },
 
   card: {
 
-    width: "48%",
+    backgroundColor: "white",
 
-    backgroundColor: "#f5f5f5",
+    borderRadius: 22,
 
-    borderRadius: 18,
+    flexDirection: "row",
 
     padding: 12,
 
-    marginBottom: 15,
+    marginBottom: 16,
+
+    elevation: 2,
 
   },
 
   image: {
 
-    width: "100%",
+    width: 110,
 
-    height: 150,
+    height: 110,
 
-    borderRadius: 15,
+    borderRadius: 18,
+
+  },
+
+  info: {
+
+    flex: 1,
+
+    marginLeft: 12,
+
+    justifyContent: "space-between",
 
   },
 
   name: {
 
-    fontSize: 16,
+    fontSize: 17,
 
     fontWeight: "bold",
 
-    marginTop: 10,
+    color: "#111",
 
   },
 
   price: {
 
-    fontSize: 18,
-
-    color: "#e94560",
+    fontSize: 22,
 
     fontWeight: "bold",
 
-    marginTop: 8,
+    color: "#2874f0",
+
+    marginTop: 6,
+
+  },
+
+  actions: {
+
+    flexDirection: "row",
+
+    alignItems: "center",
+
+    justifyContent:
+      "space-between",
+
+    marginTop: 15,
+
+  },
+
+  cartButton: {
+
+    backgroundColor: "#2874f0",
+
+    paddingHorizontal: 18,
+
+    paddingVertical: 10,
+
+    borderRadius: 12,
+
+  },
+
+  cartText: {
+
+    color: "white",
+
+    fontWeight: "bold",
+
+  },
+
+  removeButton: {
+
+    padding: 8,
 
   },
 

@@ -121,6 +121,7 @@ export const CartProvider = ({ children }) => {
         clearCart,
         totalItems,
         totalPrice,
+        
       }}
     >
 

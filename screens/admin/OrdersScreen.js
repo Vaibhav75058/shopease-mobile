@@ -81,7 +81,7 @@ export default function OrdersScreen() {
 
       await axios.put(
 
-        `https://e-commerce-mern-stack-0okr.onrender.com/api/orders/${id}/deliver`,
+       `https://e-commerce-mern-stack-0okr.onrender.com/api/orders/${id}/status`,
 
         {
           status,

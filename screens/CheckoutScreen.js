@@ -1,210 +1,377 @@
-import React, { useState } from "react";
+import React, {
+  useState,
+} from "react";
+
+import axios from "axios";
+
+import {
+  Alert,
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  ScrollView,
+  ActivityIndicator,
+} from "react-native";
 
 import {
   SafeAreaView,
 } from "react-native-safe-area-context";
 
+import Ionicons
+  from "@expo/vector-icons/Ionicons";
+
 import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  StyleSheet,
-  ScrollView,
-  Alert,
-} from "react-native";
+  useCart,
+} from "../src/context/CartContext";
 
-import axios from "axios";
+import {
+  useAuth,
+} from "../src/context/AuthContext";
 
-import { useCart } from "../src/context/CartContext";
+export default function CheckoutScreen({
 
-import { useAuth } from "../src/context/AuthContext";
+  navigation,
 
-export default function CheckoutScreen({ navigation }) {
+}) {
 
-  const [address, setAddress] = useState("");
+  const cart = useCart();
+  
+  const auth = useAuth();
 
-  const [city, setCity] = useState("");
+  const user =
+    auth?.user;
 
-  const [pincode, setPincode] = useState("");
+  const cartItems =
+    cart?.cartItems || [];
 
-  const [phone, setPhone] = useState("");
+  const totalPrice =
+    cartItems.reduce(
 
-  const [loading, setLoading] = useState(false);
+      (total, item) =>
 
-  const {
-    cartItems,
-    totalPrice,
-    clearCart,
-  } = useCart();
+        total + item.price,
 
-  const { user } = useAuth();
+      0
 
-  const placeOrder = async () => {
+    );
 
-    if (
-      !address ||
-      !city ||
-      !pincode ||
-      !phone
-    ) {
+  const [
+    paymentMethod,
+    setPaymentMethod,
+  ] = useState("COD");
 
-      Alert.alert(
-        "Error",
-        "Please fill all fields"
-      );
+  const [
+    loading,
+    setLoading,
+  ] = useState(false);
 
-      return;
+  const placeOrder =
+    async () => {
 
-    }
+      try {
 
-    try {
+        setLoading(true);
 
-      setLoading(true);
+        const orderData = {
 
-      const orderData = {
+          orderItems:
 
-        orderItems: cartItems.map((item) => ({
+            cartItems.map(
+              (item) => ({
 
-          name: item.name,
+                name:
+                  item.name,
 
-          qty: item.qty,
+                qty: 1,
 
-          image: item.image,
+                image:
+                  item.image,
 
-          price: item.price,
+                price:
+                  item.price,
 
-          product: item._id,
+                product:
+                  item._id,
 
-        })),
+              })
+            ),
 
-        shippingAddress: {
+          shippingAddress: {
 
-          address,
-          city,
-          pincode,
-          phone,
+            address:
+              "Kanpur",
 
-        },
+            city:
+              "Kanpur",
 
-        totalPrice,
+            pincode:
+              "208017",
 
-      };
+            phone:
+              "9876543210",
 
-      const config = {
+          },
 
-        headers: {
+          paymentMethod,
 
-          Authorization:
-            `Bearer ${user.token}`,
+          totalPrice,
 
-        },
+        };
 
-      };
+        await axios.post(
 
-      await axios.post(
+          "https://e-commerce-mern-stack-0okr.onrender.com/api/orders",
 
-        "https://e-commerce-mern-stack-0okr.onrender.com/api/orders",
+          orderData,
 
-        orderData,
+          {
 
-        config
+            headers: {
 
-      );
+              Authorization:
+                `Bearer ${user.token}`,
 
-      await clearCart();
+            },
 
-      Alert.alert(
-        "Success",
-        "Order Placed Successfully"
-      );
+          }
 
-      navigation.navigate("Orders");
+        );
 
-    } catch (error) {
+        Alert.alert(
 
-      console.log(error);
+          "Success 🎉",
 
-      Alert.alert(
-        "Error",
-        "Order Failed"
-      );
+          "Order placed successfully!"
 
-    } finally {
+        );
+        
+        navigation.navigate(
+          "MyOrders"
+        );
 
-      setLoading(false);
+      } catch (error) {
 
-    }
+        console.log(error);
 
-  };
+        Alert.alert(
+          "Error",
+          "Order failed"
+        );
+
+      } finally {
+
+        setLoading(false);
+
+      }
+
+    };
 
   return (
 
     <SafeAreaView
+      edges={["top"]}
       style={styles.container}
     >
 
-      <ScrollView>
+      <ScrollView
+        showsVerticalScrollIndicator={
+          false
+        }
+      >
 
-        <Text style={styles.heading}>
-          Checkout
-        </Text>
+        {/* ADDRESS */}
 
-        <TextInput
-          placeholder="Address"
-          style={styles.input}
-          value={address}
-          onChangeText={setAddress}
-        />
+        <View style={styles.card}>
 
-        <TextInput
-          placeholder="City"
-          style={styles.input}
-          value={city}
-          onChangeText={setCity}
-        />
-
-        <TextInput
-          placeholder="Pincode"
-          style={styles.input}
-          value={pincode}
-          onChangeText={setPincode}
-        />
-
-        <TextInput
-          placeholder="Phone"
-          style={styles.input}
-          value={phone}
-          onChangeText={setPhone}
-        />
-
-        <View style={styles.summary}>
-
-          <Text style={styles.total}>
-            Total: ₹ {totalPrice}
+          <Text style={styles.heading}>
+            Deliver To
           </Text>
+
+          <View style={styles.addressRow}>
+
+            <Ionicons
+              name="location"
+              size={24}
+              color="#2874f0"
+            />
+
+            <View
+              style={{
+                marginLeft: 10,
+              }}
+            >
+
+              <Text
+                style={
+                  styles.addressName
+                }
+              >
+                Vaibhav Sharma
+              </Text>
+
+              <Text
+                style={
+                  styles.addressText
+                }
+              >
+                Kanpur, Uttar Pradesh
+              </Text>
+
+            </View>
+
+          </View>
 
         </View>
 
+        {/* PAYMENT */}
+
+        <View style={styles.card}>
+
+          <Text style={styles.heading}>
+            Payment Method
+          </Text>
+
+          {[
+            "UPI",
+            "Card",
+            "COD",
+          ].map((method) => (
+
+            <TouchableOpacity
+
+              key={method}
+
+              style={styles.paymentItem}
+
+              onPress={() =>
+                setPaymentMethod(
+                  method
+                )
+              }
+
+            >
+
+              <View
+                style={
+                  styles.paymentLeft
+                }
+              >
+
+                <Ionicons
+
+                  name={
+                    paymentMethod ===
+                      method
+
+                      ? "radio-button-on"
+
+                      : "radio-button-off"
+                  }
+
+                  size={22}
+
+                  color="#2874f0"
+
+                />
+
+                <Text
+                  style={
+                    styles.paymentText
+                  }
+                >
+                  {method}
+                </Text>
+
+              </View>
+
+            </TouchableOpacity>
+
+          ))}
+
+        </View>
+
+        {/* ORDER SUMMARY */}
+
+        <View style={styles.card}>
+
+          <Text style={styles.heading}>
+            Order Summary
+          </Text>
+
+          <View style={styles.summaryRow}>
+
+            <Text style={styles.summaryText}>
+              Items Total
+            </Text>
+
+            <Text style={styles.summaryPrice}>
+              ₹ {totalPrice}
+            </Text>
+
+          </View>
+
+          <View style={styles.summaryRow}>
+
+            <Text style={styles.summaryText}>
+              Delivery Fee
+            </Text>
+
+            <Text style={styles.summaryPrice}>
+              FREE
+            </Text>
+
+          </View>
+
+          <View style={styles.summaryRow}>
+
+            <Text style={styles.totalText}>
+              Total Amount
+            </Text>
+
+            <Text style={styles.totalPrice}>
+              ₹ {totalPrice}
+            </Text>
+
+          </View>
+
+        </View>
+
+      </ScrollView>
+
+      {/* PLACE ORDER */}
+
+      <View style={styles.bottomBar}>
+
         <TouchableOpacity
 
-          style={styles.button}
+          style={styles.orderButton}
 
           onPress={placeOrder}
 
+          disabled={loading}
+
         >
 
-          <Text style={styles.buttonText}>
+          {loading ? (
 
-            {loading
-              ? "Placing Order..."
-              : "Place Order"}
+            <ActivityIndicator
+              color="white"
+            />
 
-          </Text>
+          ) : (
+
+            <Text
+              style={styles.orderText}
+            >
+              Place Order
+            </Text>
+
+          )}
 
         </TouchableOpacity>
 
-      </ScrollView>
+      </View>
 
     </SafeAreaView>
 
@@ -218,77 +385,162 @@ const styles = StyleSheet.create({
 
     flex: 1,
 
-    backgroundColor: "#fff",
+    backgroundColor: "#f5f7fb",
 
-    padding: 20,
+  },
+
+  card: {
+
+    backgroundColor: "white",
+
+    margin: 15,
+
+    borderRadius: 20,
+
+    padding: 18,
+
+    elevation: 2,
 
   },
 
   heading: {
 
-    fontSize: 30,
+    fontSize: 20,
 
     fontWeight: "bold",
 
-    marginBottom: 25,
+    marginBottom: 16,
 
   },
 
-  input: {
+  addressRow: {
 
-    backgroundColor: "#f5f5f5",
+    flexDirection: "row",
 
-    padding: 15,
-
-    borderRadius: 10,
-
-    marginBottom: 15,
+    alignItems: "center",
 
   },
 
-  summary: {
+  addressName: {
 
-    backgroundColor: "#f5f5f5",
+    fontWeight: "bold",
 
-    padding: 20,
-
-    borderRadius: 10,
-
-    marginTop: 20,
+    fontSize: 16,
 
   },
 
-  total: {
+  addressText: {
+
+    color: "gray",
+
+    marginTop: 4,
+
+  },
+
+  paymentItem: {
+
+    paddingVertical: 14,
+
+    borderBottomWidth: 1,
+
+    borderBottomColor: "#eee",
+
+  },
+
+  paymentLeft: {
+
+    flexDirection: "row",
+
+    alignItems: "center",
+
+  },
+
+  paymentText: {
+
+    marginLeft: 10,
+
+    fontSize: 16,
+
+    fontWeight: "500",
+
+  },
+
+  summaryRow: {
+
+    flexDirection: "row",
+
+    justifyContent:
+      "space-between",
+
+    marginBottom: 16,
+
+  },
+
+  summaryText: {
+
+    color: "#555",
+
+    fontSize: 15,
+
+  },
+
+  summaryPrice: {
+
+    fontWeight: "600",
+
+  },
+
+  totalText: {
+
+    fontSize: 20,
+
+    fontWeight: "bold",
+
+  },
+
+  totalPrice: {
 
     fontSize: 22,
 
     fontWeight: "bold",
 
-    color: "#e94560",
+    color: "#2874f0",
 
   },
 
-  button: {
+  bottomBar: {
 
-    backgroundColor: "#e94560",
+    backgroundColor: "white",
 
     padding: 18,
 
-    borderRadius: 10,
+    borderTopLeftRadius: 24,
 
-    alignItems: "center",
+    borderTopRightRadius: 24,
 
-    marginTop: 30,
+    elevation: 10,
 
   },
 
-  buttonText: {
+  orderButton: {
+
+    backgroundColor: "#2874f0",
+
+    paddingVertical: 18,
+
+    borderRadius: 18,
+
+    alignItems: "center",
+
+  },
+
+  orderText: {
 
     color: "white",
 
-    fontSize: 18,
-
     fontWeight: "bold",
+
+    fontSize: 18,
 
   },
 
