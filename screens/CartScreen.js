@@ -26,46 +26,112 @@ export default function CartScreen({
 
 }) {
 
-  const cart = useCart();
+  const {
 
-  const cartItems =
-    cart?.cartItems || [];
+    cartItems,
 
-  const removeFromCart =
-    cart?.removeFromCart;
+    removeFromCart,
 
-  const totalPrice =
+    increaseQty,
+
+    decreaseQty,
+
+  } = useCart();
+
+  /* TOTAL */
+
+  const itemsTotal =
     cartItems.reduce(
 
-      (total, item) =>
+      (acc, item) =>
 
-        total + item.price,
+        acc +
+        item.price * item.qty,
 
       0
 
     );
+
+  const totalMRP =
+    cartItems.reduce(
+
+      (acc, item) =>
+
+        acc +
+        (item.price + 500) *
+          item.qty,
+
+      0
+
+    );
+
+  const savings =
+    totalMRP - itemsTotal;
+
+  const deliveryFee =
+    itemsTotal > 999
+      ? 0
+      : 49;
+
+  const totalAmount =
+    itemsTotal + deliveryFee;
+
+  /* EMPTY */
 
   if (cartItems.length === 0) {
 
     return (
 
       <SafeAreaView
-        style={styles.emptyContainer}
+        style={
+          styles.emptyContainer
+        }
       >
 
-        <Ionicons
-          name="cart-outline"
-          size={100}
-          color="#ccc"
-        />
+        <View
+          style={
+            styles.emptyIconBox
+          }
+        >
 
-        <Text style={styles.emptyText}>
-          Your cart is empty
+          <Ionicons
+
+            name="cart-outline"
+
+            size={90}
+
+            color="#2874f0"
+
+          />
+
+        </View>
+
+        <Text
+          style={
+            styles.emptyTitle
+          }
+        >
+
+          Your Cart is Empty
+
+        </Text>
+
+        <Text
+          style={
+            styles.emptySub
+          }
+        >
+
+          Looks like you have
+          not added anything yet
+
         </Text>
 
         <TouchableOpacity
 
-          style={styles.shopButton}
+          style={
+            styles.shopButton
+          }
 
           onPress={() =>
             navigation.navigate(
@@ -75,8 +141,14 @@ export default function CartScreen({
 
         >
 
-          <Text style={styles.shopText}>
+          <Text
+            style={
+              styles.shopText
+            }
+          >
+
             Continue Shopping
+
           </Text>
 
         </TouchableOpacity>
@@ -90,15 +162,44 @@ export default function CartScreen({
   return (
 
     <SafeAreaView
-      edges={["top"]}
       style={styles.container}
     >
+
+      {/* HEADER */}
+
+      <View
+        style={styles.header}
+      >
+
+        <Text
+          style={styles.heading}
+        >
+
+          My Cart 🛒
+
+        </Text>
+
+        <Text
+          style={styles.subHeading}
+        >
+
+          {
+            cartItems.length
+          } Items
+
+        </Text>
+
+      </View>
+
+      {/* PRODUCTS */}
 
       <FlatList
 
         data={cartItems}
 
-        keyExtractor={(item) =>
+        keyExtractor={(
+          item
+        ) =>
           item._id
         }
 
@@ -107,73 +208,163 @@ export default function CartScreen({
         }
 
         contentContainerStyle={{
-          paddingBottom: 220,
+          paddingBottom: 260,
         }}
 
         renderItem={({ item }) => (
 
-          <View style={styles.card}>
+          <View
+            style={styles.card}
+          >
+
+            {/* IMAGE */}
 
             <Image
 
               source={{
-                uri: item.image,
+                uri:
+                  item.image,
               }}
 
               style={styles.image}
 
             />
 
-            <View style={styles.info}>
+            {/* INFO */}
+
+            <View
+              style={styles.info}
+            >
 
               <Text
-                numberOfLines={1}
+
+                numberOfLines={2}
+
                 style={styles.name}
+
               >
 
                 {item.name}
 
               </Text>
 
-              <Text style={styles.category}>
+              <Text
+                style={
+                  styles.category
+                }
+              >
+
                 {item.category}
+
               </Text>
 
-              <Text style={styles.price}>
-                ₹ {item.price}
-              </Text>
+              {/* PRICE */}
+
+              <View
+                style={
+                  styles.priceRow
+                }
+              >
+
+                <Text
+                  style={
+                    styles.price
+                  }
+                >
+
+                  ₹ {item.price}
+
+                </Text>
+
+                <Text
+                  style={
+                    styles.oldPrice
+                  }
+                >
+
+                  ₹ {item.price + 500}
+
+                </Text>
+
+              </View>
 
               {/* ACTIONS */}
 
-              <View style={styles.actions}>
+              <View
+                style={
+                  styles.actions
+                }
+              >
+
+                {/* MINUS */}
 
                 <TouchableOpacity
-                  style={styles.qtyButton}
+
+                  style={
+                    styles.qtyButton
+                  }
+
+                  onPress={() =>
+                    decreaseQty(
+                      item._id
+                    )
+                  }
+
                 >
 
                   <Ionicons
+
                     name="remove"
+
                     size={18}
+
                     color="#111"
+
                   />
 
                 </TouchableOpacity>
 
-                <Text style={styles.qty}>
-                  1
+                {/* QTY */}
+
+                <Text
+                  style={
+                    styles.qty
+                  }
+                >
+
+                  {item.qty}
+
                 </Text>
 
+                {/* PLUS */}
+
                 <TouchableOpacity
-                  style={styles.qtyButton}
+
+                  style={
+                    styles.qtyButton
+                  }
+
+                  onPress={() =>
+                    increaseQty(
+                      item._id
+                    )
+                  }
+
                 >
 
                   <Ionicons
+
                     name="add"
+
                     size={18}
+
                     color="#111"
+
                   />
 
                 </TouchableOpacity>
+
+                {/* REMOVE */}
 
                 <TouchableOpacity
 
@@ -189,13 +380,15 @@ export default function CartScreen({
 
                 >
 
-                  <Text
-                    style={
-                      styles.removeText
-                    }
-                  >
-                    Remove
-                  </Text>
+                  <Ionicons
+
+                    name="trash-outline"
+
+                    size={20}
+
+                    color="#e94560"
+
+                  />
 
                 </TouchableOpacity>
 
@@ -209,33 +402,78 @@ export default function CartScreen({
 
       />
 
-      {/* BOTTOM BAR */}
+      {/* BOTTOM SUMMARY */}
 
-      <View style={styles.bottomBar}>
+      <View
+        style={styles.bottomBar}
+      >
 
-        <View>
+        {/* LEFT */}
 
-          <Text style={styles.totalLabel}>
-            Total Price
+        <View
+          style={{
+            flex: 1,
+          }}
+        >
+
+          <Text
+            style={
+              styles.totalLabel
+            }
+          >
+
+            Total Amount
+
           </Text>
 
-          <Text style={styles.totalPrice}>
-            ₹ {totalPrice}
+          <Text
+            style={
+              styles.totalPrice
+            }
+          >
+
+            ₹ {totalAmount}
+
           </Text>
 
-          <Text style={styles.savings}>
-            You saved ₹500 🎉
+          <Text
+            style={
+              styles.savings
+            }
+          >
+
+            You saved ₹
+            {savings} 🎉
+
           </Text>
 
-          <Text style={styles.delivery}>
-            Free Delivery
+          <Text
+            style={
+              styles.delivery
+            }
+          >
+
+            {
+
+              deliveryFee === 0
+
+                ? "Free Delivery"
+
+                : `Delivery ₹${deliveryFee}`
+
+            }
+
           </Text>
 
         </View>
 
+        {/* CHECKOUT */}
+
         <TouchableOpacity
 
-          style={styles.checkoutButton}
+          style={
+            styles.checkoutButton
+          }
 
           onPress={() =>
             navigation.navigate(
@@ -246,9 +484,13 @@ export default function CartScreen({
         >
 
           <Text
-            style={styles.checkoutText}
+            style={
+              styles.checkoutText
+            }
           >
-            Place Order
+
+            Checkout
+
           </Text>
 
         </TouchableOpacity>
@@ -261,268 +503,363 @@ export default function CartScreen({
 
 }
 
-const styles = StyleSheet.create({
+const styles =
+  StyleSheet.create({
 
-  container: {
+    container: {
 
-    flex: 1,
+      flex: 1,
 
-    backgroundColor: "#f5f7fb",
+      backgroundColor:
+        "#f5f7fb",
 
-    padding: 15,
+      paddingHorizontal: 15,
 
-  },
+    },
 
-  emptyContainer: {
+    header: {
 
-    flex: 1,
+      marginTop: 10,
 
-    justifyContent: "center",
+      marginBottom: 20,
 
-    alignItems: "center",
+    },
 
-    backgroundColor: "#fff",
+    heading: {
 
-  },
+      fontSize: 32,
 
-  emptyText: {
+      fontWeight: "bold",
 
-    marginTop: 20,
+      color: "#111",
 
-    fontSize: 22,
+    },
 
-    fontWeight: "bold",
+    subHeading: {
 
-    color: "#888",
+      color: "gray",
 
-  },
+      marginTop: 5,
 
-  shopButton: {
+      fontSize: 15,
 
-    backgroundColor: "#2874f0",
+    },
 
-    paddingHorizontal: 24,
+    /* EMPTY */
 
-    paddingVertical: 14,
+    emptyContainer: {
 
-    borderRadius: 18,
+      flex: 1,
 
-    marginTop: 25,
+      justifyContent:
+        "center",
 
-  },
+      alignItems: "center",
 
-  shopText: {
+      backgroundColor:
+        "#fff",
 
-    color: "white",
+      paddingHorizontal: 30,
 
-    fontWeight: "bold",
+    },
 
-    fontSize: 16,
+    emptyIconBox: {
 
-  },
+      width: 170,
 
-  card: {
+      height: 170,
 
-    backgroundColor: "white",
+      borderRadius: 100,
 
-    borderRadius: 22,
+      backgroundColor:
+        "#eef4ff",
 
-    flexDirection: "row",
+      justifyContent:
+        "center",
 
-    padding: 12,
+      alignItems: "center",
 
-    marginBottom: 16,
+    },
 
-    elevation: 2,
+    emptyTitle: {
 
-  },
+      marginTop: 25,
 
-  image: {
+      fontSize: 28,
 
-    width: 110,
+      fontWeight: "bold",
 
-    height: 110,
+      color: "#111",
 
-    borderRadius: 18,
+    },
 
-  },
+    emptySub: {
 
-  info: {
+      marginTop: 10,
 
-    flex: 1,
+      color: "gray",
 
-    marginLeft: 12,
+      textAlign: "center",
 
-    justifyContent: "space-between",
+      fontSize: 15,
 
-  },
+      lineHeight: 24,
 
-  name: {
+    },
 
-    fontSize: 17,
+    shopButton: {
 
-    fontWeight: "bold",
+      backgroundColor:
+        "#2874f0",
 
-    color: "#111",
+      paddingHorizontal: 30,
 
-  },
+      paddingVertical: 16,
 
-  category: {
+      borderRadius: 18,
 
-    color: "gray",
+      marginTop: 30,
 
-    marginTop: 4,
+    },
 
-  },
+    shopText: {
 
-  price: {
+      color: "white",
 
-    fontSize: 20,
+      fontWeight: "bold",
 
-    fontWeight: "bold",
+      fontSize: 16,
 
-    color: "#2874f0",
+    },
 
-    marginTop: 5,
+    /* CARD */
 
-  },
+    card: {
 
-  actions: {
+      backgroundColor:
+        "white",
 
-    flexDirection: "row",
+      borderRadius: 24,
 
-    alignItems: "center",
+      flexDirection: "row",
 
-    marginTop: 12,
+      padding: 14,
 
-  },
+      marginBottom: 18,
 
-  qtyButton: {
+      elevation: 3,
 
-    width: 32,
+    },
 
-    height: 32,
+    image: {
 
-    borderRadius: 16,
+      width: 120,
 
-    backgroundColor: "#eee",
+      height: 120,
 
-    justifyContent: "center",
+      borderRadius: 20,
 
-    alignItems: "center",
+      resizeMode: "cover",
 
-  },
+    },
 
-  qty: {
+    info: {
 
-    marginHorizontal: 12,
+      flex: 1,
 
-    fontWeight: "bold",
+      marginLeft: 14,
 
-    fontSize: 16,
+      justifyContent:
+        "space-between",
 
-  },
+    },
 
-  removeButton: {
+    name: {
 
-    marginLeft: 18,
+      fontSize: 16,
 
-  },
+      fontWeight: "bold",
 
-  removeText: {
+      color: "#111",
 
-    color: "#e94560",
+    },
 
-    fontWeight: "bold",
+    category: {
 
-  },
+      color: "gray",
 
-  bottomBar: {
+      marginTop: 6,
 
-    position: "absolute",
+    },
 
-    bottom: 80,
+    priceRow: {
 
-    left: 10,
+      flexDirection: "row",
 
-    right: 10,
+      alignItems: "center",
 
-    backgroundColor: "white",
+      marginTop: 10,
 
-    padding: 20,
+    },
 
-    flexDirection: "row",
+    price: {
 
-    justifyContent: "space-between",
+      fontSize: 22,
 
-    alignItems: "center",
+      fontWeight: "bold",
 
-    borderRadius: 24,
+      color: "#2874f0",
 
-    elevation: 10,
+    },
 
-  },
+    oldPrice: {
 
-  totalLabel: {
+      marginLeft: 10,
 
-    color: "gray",
+      color: "gray",
 
-    fontSize: 14,
+      textDecorationLine:
+        "line-through",
 
-  },
+    },
 
-  totalPrice: {
+    actions: {
 
-    fontSize: 24,
+      flexDirection: "row",
 
-    fontWeight: "bold",
+      alignItems: "center",
 
-    color: "#111",
+      marginTop: 15,
 
-    marginTop: 4,
+    },
 
-  },
+    qtyButton: {
 
-  savings: {
+      width: 36,
 
-    color: "green",
+      height: 36,
 
-    fontWeight: "bold",
+      borderRadius: 12,
 
-    marginTop: 4,
+      backgroundColor:
+        "#f0f2f5",
 
-  },
+      justifyContent:
+        "center",
 
-  delivery: {
+      alignItems: "center",
 
-    color: "#2874f0",
+    },
 
-    marginTop: 4,
+    qty: {
 
-    fontWeight: "600",
+      marginHorizontal: 18,
 
-  },
+      fontWeight: "bold",
 
-  checkoutButton: {
+      fontSize: 18,
 
-    backgroundColor: "#2874f0",
+      color: "#111",
 
-    paddingHorizontal: 28,
+    },
 
-    paddingVertical: 15,
+    removeButton: {
 
-    borderRadius: 18,
+      marginLeft: 18,
 
-  },
+    },
 
-  checkoutText: {
+    /* BOTTOM */
 
-    color: "white",
+    bottomBar: {
 
-    fontWeight: "bold",
+      position: "absolute",
 
-    fontSize: 16,
+      bottom: 80,
 
-  },
+      left: 12,
 
-});
+      right: 12,
+
+      backgroundColor:
+        "white",
+
+      padding: 22,
+
+      borderRadius: 28,
+
+      flexDirection: "row",
+
+      justifyContent:
+        "space-between",
+
+      alignItems: "center",
+
+      elevation: 15,
+
+    },
+
+    totalLabel: {
+
+      color: "gray",
+
+      fontSize: 14,
+
+    },
+
+    totalPrice: {
+
+      fontSize: 28,
+
+      fontWeight: "bold",
+
+      color: "#111",
+
+      marginTop: 5,
+
+    },
+
+    savings: {
+
+      color: "green",
+
+      fontWeight: "bold",
+
+      marginTop: 6,
+
+    },
+
+    delivery: {
+
+      color: "#2874f0",
+
+      marginTop: 6,
+
+      fontWeight: "600",
+
+    },
+
+    checkoutButton: {
+
+      backgroundColor:
+        "#2874f0",
+
+      paddingHorizontal: 30,
+
+      paddingVertical: 18,
+
+      borderRadius: 18,
+
+    },
+
+    checkoutText: {
+
+      color: "white",
+
+      fontWeight: "bold",
+
+      fontSize: 16,
+
+    },
+
+  });

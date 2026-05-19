@@ -12,11 +12,8 @@ import {
   Image,
   ScrollView,
   TouchableOpacity,
+  Alert,
 } from "react-native";
-
-import {
-  useWishlist,
-} from "../src/context/WishlistContext";
 
 import {
   SafeAreaView,
@@ -26,20 +23,27 @@ import Ionicons
   from "@expo/vector-icons/Ionicons";
 
 import {
+  useWishlist,
+} from "../src/context/WishlistContext";
+
+import {
   useCart,
 } from "../src/context/CartContext";
 
 export default function ProductDetailsScreen({
 
   route,
+
   navigation,
 
 }) {
 
-  const { product } =
-    route.params;
+  const {
+    product,
+  } = route.params;
 
-  const cart = useCart();
+  const cart =
+    useCart();
 
   const addToCart =
     cart?.addToCart;
@@ -51,9 +55,52 @@ export default function ProductDetailsScreen({
     wishlist?.addToWishlist;
 
   const [
-    showAlert,
-    setShowAlert,
+    showWishlistAlert,
+    setShowWishlistAlert,
   ] = useState(false);
+
+  const [
+    showCartAlert,
+    setShowCartAlert,
+  ] = useState(false);
+
+  /* ADD TO CART */
+
+  const handleAddToCart =
+    () => {
+
+      addToCart(product);
+
+      setShowCartAlert(true);
+
+      setTimeout(() => {
+
+        setShowCartAlert(false);
+
+      }, 1800);
+
+    };
+
+  /* WISHLIST */
+
+  const handleWishlist =
+    () => {
+
+      addToWishlist(product);
+
+      setShowWishlistAlert(
+        true
+      );
+
+      setTimeout(() => {
+
+        setShowWishlistAlert(
+          false
+        );
+
+      }, 1800);
+
+    };
 
   return (
 
@@ -68,45 +115,62 @@ export default function ProductDetailsScreen({
         }
       >
 
-        {/* PRODUCT IMAGE */}
+        {/* IMAGE SECTION */}
 
-        <View style={styles.imageContainer}>
+        <View
+          style={
+            styles.imageContainer
+          }
+        >
 
           <Image
 
             source={{
-              uri: product.image,
+              uri:
+                product.image,
             }}
 
             style={styles.image}
 
           />
 
+          {/* BACK */}
+
+          <TouchableOpacity
+
+            style={styles.backBtn}
+
+            onPress={() =>
+              navigation.goBack()
+            }
+
+          >
+
+            <Ionicons
+              name="arrow-back"
+              size={24}
+              color="#111"
+            />
+
+          </TouchableOpacity>
+
           {/* WISHLIST */}
 
           <TouchableOpacity
 
-            style={styles.wishlist}
+            style={
+              styles.wishlistBtn
+            }
 
-            onPress={() => {
-
-              addToWishlist(product);
-
-              setShowAlert(true);
-
-              setTimeout(() => {
-
-                setShowAlert(false);
-
-              }, 1800);
-
-            }}
+            onPress={
+              handleWishlist
+            }
 
           >
 
             <Ionicons
               name="heart-outline"
-              size={26}
+              size={24}
               color="#111"
             />
 
@@ -114,98 +178,243 @@ export default function ProductDetailsScreen({
 
         </View>
 
-        {/* PRODUCT INFO */}
+        {/* INFO */}
 
-        <View style={styles.infoContainer}>
+        <View
+          style={
+            styles.infoContainer
+          }
+        >
 
-          <Text style={styles.name}>
+          {/* CATEGORY */}
+
+          <View
+            style={
+              styles.categoryBox
+            }
+          >
+
+            <Text
+              style={
+                styles.categoryText
+              }
+            >
+
+              {
+                product.category
+              }
+
+            </Text>
+
+          </View>
+
+          {/* NAME */}
+
+          <Text
+            style={styles.name}
+          >
+
             {product.name}
+
           </Text>
 
-          {/* RATINGS */}
+          {/* RATING */}
 
-          <View style={styles.ratingRow}>
+          <View
+            style={
+              styles.ratingRow
+            }
+          >
 
-            <View style={styles.ratingBox}>
+            <View
+              style={
+                styles.ratingBox
+              }
+            >
 
-              <Text style={styles.rating}>
-                4.4 ★
+              <Text
+                style={
+                  styles.rating
+                }
+              >
+
+                {product.rating} ★
+
               </Text>
 
             </View>
 
-            <Text style={styles.ratingText}>
-              12,430 Ratings
+            <Text
+              style={
+                styles.ratingText
+              }
+            >
+
+              {product.numReviews}
+              Ratings & Reviews
+
             </Text>
 
           </View>
 
           {/* PRICE */}
 
-          <View style={styles.priceRow}>
+          <View
+            style={
+              styles.priceRow
+            }
+          >
 
-            <Text style={styles.price}>
+            <Text
+              style={
+                styles.price
+              }
+            >
+
               ₹ {product.price}
+
             </Text>
 
-            <Text style={styles.oldPrice}>
-              ₹ {product.price + 2500}
+            <Text
+              style={
+                styles.oldPrice
+              }
+            >
+
+              ₹ {product.originalPrice}
+
             </Text>
 
-            <Text style={styles.discount}>
-              45% OFF
+            <Text
+              style={
+                styles.discount
+              }
+            >
+
+              {product.discountPercent}% OFF
+
             </Text>
 
           </View>
+
+          {/* STOCK */}
+
+          <Text
+            style={
+              styles.stock
+            }
+          >
+
+            {
+              product.inStock
+                ? "In Stock"
+                : "Out Of Stock"
+            }
+
+          </Text>
 
           {/* OFFERS */}
 
-          <View style={styles.offerBox}>
+          {
 
-            <Text style={styles.offerTitle}>
-              Available Offers
-            </Text>
+            product.offers?.map(
+              (
+                offer,
+                index
+              ) => (
 
-            <Text style={styles.offer}>
-              • Bank Offer 10% Instant
-              Discount
-            </Text>
+                <Text
 
-            <Text style={styles.offer}>
-              • Special Price Get extra
-              ₹500 off
-            </Text>
+                  key={index}
 
-            <Text style={styles.offer}>
-              • Free Delivery
-            </Text>
+                  style={
+                    styles.offer
+                  }
 
-          </View>
+                >
+
+                  • {offer}
+
+                </Text>
+
+              )
+            )
+
+          }
 
           {/* DESCRIPTION */}
 
-          <Text style={styles.sectionTitle}>
-            Description
+          <Text
+            style={
+              styles.sectionTitle
+            }
+          >
+
+            Product Description
+
           </Text>
 
-          <Text style={styles.description}>
-            {product.description ||
-              "Premium quality product with modern design and best performance."}
+          <Text
+            style={
+              styles.description
+            }
+          >
+
+            {
+
+              product.description ||
+
+              "Premium quality product with amazing build quality and modern design."
+
+            }
+
           </Text>
 
           {/* DELIVERY */}
 
-          <View style={styles.deliveryBox}>
+          <View
+            style={
+              styles.deliveryBox
+            }
+          >
 
             <Ionicons
               name="location-outline"
-              size={24}
+              size={26}
               color="#2874f0"
             />
 
-            <Text style={styles.deliveryText}>
-              Delivery in 2-4 days
-            </Text>
+            <View
+              style={{
+                marginLeft: 12,
+              }}
+            >
+
+              <Text
+                style={{
+                  fontWeight:
+                    "bold",
+                }}
+              >
+
+                Delivery in
+                {product.deliveryDays}
+
+              </Text>
+
+              <Text
+                style={{
+                  color: "gray",
+                  marginTop: 4,
+                }}
+              >
+
+                Free delivery
+                available
+
+              </Text>
+
+            </View>
 
           </View>
 
@@ -215,14 +424,20 @@ export default function ProductDetailsScreen({
 
       {/* BOTTOM BUTTONS */}
 
-      <View style={styles.bottomBar}>
+      <View
+        style={styles.bottomBar}
+      >
+
+        {/* CART */}
 
         <TouchableOpacity
 
-          style={styles.cartButton}
+          style={
+            styles.cartButton
+          }
 
-          onPress={() =>
-            addToCart(product)
+          onPress={
+            handleAddToCart
           }
 
         >
@@ -233,15 +448,25 @@ export default function ProductDetailsScreen({
             color="white"
           />
 
-          <Text style={styles.buttonText}>
+          <Text
+            style={
+              styles.buttonText
+            }
+          >
+
             Add to Cart
+
           </Text>
 
         </TouchableOpacity>
 
+        {/* BUY */}
+
         <TouchableOpacity
 
-          style={styles.buyButton}
+          style={
+            styles.buyButton
+          }
 
           onPress={() =>
             navigation.navigate(
@@ -251,21 +476,27 @@ export default function ProductDetailsScreen({
 
         >
 
-          <Text style={styles.buttonText}>
+          <Text
+            style={
+              styles.buttonText
+            }
+          >
+
             Buy Now
+
           </Text>
 
         </TouchableOpacity>
 
       </View>
 
-      {/* ALERT */}
+      {/* WISHLIST ALERT */}
 
       <AwesomeAlert
 
-        show={showAlert}
-
-        showProgress={false}
+        show={
+          showWishlistAlert
+        }
 
         title="Wishlist ❤️"
 
@@ -275,7 +506,53 @@ export default function ProductDetailsScreen({
 
         closeOnHardwareBackPress
 
-        showConfirmButton={false}
+        showConfirmButton={
+          false
+        }
+
+      />
+
+      {/* CART ALERT */}
+
+      <AwesomeAlert
+
+        show={showCartAlert}
+
+        title="Cart 🛒"
+
+        message="Product Added to Cart"
+
+        closeOnTouchOutside
+
+        closeOnHardwareBackPress
+
+        showCancelButton
+
+        showConfirmButton
+
+        cancelText="Continue"
+
+        confirmText="Go To Cart"
+
+        confirmButtonColor="#2874f0"
+
+        onConfirmPressed={() => {
+
+          setShowCartAlert(
+            false
+          );
+
+          navigation.navigate(
+            "Cart"
+          );
+
+        }}
+
+        onCancelPressed={() =>
+          setShowCartAlert(
+            false
+          )
+        }
 
       />
 
@@ -285,299 +562,378 @@ export default function ProductDetailsScreen({
 
 }
 
-const styles = StyleSheet.create({
+const styles =
+  StyleSheet.create({
 
-  container: {
+    container: {
 
-    flex: 1,
+      flex: 1,
 
-    backgroundColor: "#f5f7fb",
+      backgroundColor:
+        "#f5f7fb",
 
-  },
+    },
 
-  imageContainer: {
+    imageContainer: {
 
-    backgroundColor: "white",
+      backgroundColor:
+        "white",
 
-    alignItems: "center",
+      alignItems: "center",
 
-    padding: 20,
+      paddingVertical: 20,
 
-  },
+      borderBottomLeftRadius: 30,
 
-  image: {
+      borderBottomRightRadius: 30,
 
-    width: "100%",
+    },
 
-    height: 320,
+    image: {
 
-    resizeMode: "contain",
+      width: "100%",
 
-  },
+      height: 320,
 
-  wishlist: {
+      resizeMode:
+        "contain",
 
-    position: "absolute",
+    },
 
-    top: 20,
+    backBtn: {
 
-    right: 20,
+      position: "absolute",
 
-    backgroundColor: "white",
+      top: 20,
 
-    width: 45,
+      left: 20,
 
-    height: 45,
+      backgroundColor:
+        "white",
 
-    borderRadius: 25,
+      width: 45,
 
-    justifyContent: "center",
+      height: 45,
 
-    alignItems: "center",
+      borderRadius: 25,
 
-    elevation: 3,
+      justifyContent:
+        "center",
 
-  },
+      alignItems:
+        "center",
 
-  infoContainer: {
+      elevation: 4,
 
-    padding: 18,
+    },
 
-  },
+    wishlistBtn: {
 
-  name: {
+      position: "absolute",
 
-    fontSize: 24,
+      top: 20,
 
-    fontWeight: "bold",
+      right: 20,
 
-    color: "#111",
+      backgroundColor:
+        "white",
 
-  },
+      width: 45,
 
-  ratingRow: {
+      height: 45,
 
-    flexDirection: "row",
+      borderRadius: 25,
 
-    alignItems: "center",
+      justifyContent:
+        "center",
 
-    marginTop: 12,
+      alignItems:
+        "center",
 
-  },
+      elevation: 4,
 
-  ratingBox: {
+    },
 
-    backgroundColor: "#008000",
+    infoContainer: {
 
-    borderRadius: 8,
+      padding: 20,
 
-    paddingHorizontal: 10,
+    },
 
-    paddingVertical: 5,
+    categoryBox: {
 
-  },
+      backgroundColor:
+        "#eef4ff",
 
-  rating: {
+      alignSelf:
+        "flex-start",
 
-    color: "white",
+      paddingHorizontal: 14,
 
-    fontWeight: "bold",
+      paddingVertical: 6,
 
-  },
+      borderRadius: 30,
 
-  ratingText: {
+      marginBottom: 15,
 
-    marginLeft: 10,
+    },
 
-    color: "gray",
+    categoryText: {
 
-  },
+      color: "#2874f0",
 
-  priceRow: {
+      fontWeight: "bold",
 
-    flexDirection: "row",
+    },
 
-    alignItems: "center",
+    name: {
 
-    marginTop: 16,
+      fontSize: 28,
 
-  },
+      fontWeight: "bold",
 
-  price: {
+      color: "#111",
 
-    fontSize: 30,
+    },
 
-    fontWeight: "bold",
+    ratingRow: {
 
-    color: "#111",
+      flexDirection: "row",
 
-  },
+      alignItems: "center",
 
-  oldPrice: {
+      marginTop: 15,
 
-    marginLeft: 12,
+    },
 
-    textDecorationLine:
-      "line-through",
+    ratingBox: {
 
-    color: "gray",
+      backgroundColor:
+        "#008000",
 
-    fontSize: 18,
+      paddingHorizontal: 12,
 
-  },
+      paddingVertical: 5,
 
-  discount: {
+      borderRadius: 8,
 
-    marginLeft: 12,
+    },
 
-    color: "green",
+    rating: {
 
-    fontWeight: "bold",
+      color: "white",
 
-    fontSize: 16,
+      fontWeight: "bold",
 
-  },
+    },
 
-  offerBox: {
+    ratingText: {
 
-    backgroundColor: "white",
+      marginLeft: 10,
 
-    borderRadius: 18,
+      color: "gray",
 
-    padding: 18,
+    },
 
-    marginTop: 20,
+    priceRow: {
 
-  },
+      flexDirection: "row",
 
-  offerTitle: {
+      alignItems: "center",
 
-    fontSize: 18,
+      marginTop: 18,
 
-    fontWeight: "bold",
+    },
 
-    marginBottom: 12,
+    price: {
 
-  },
+      fontSize: 34,
 
-  offer: {
+      fontWeight: "bold",
 
-    marginBottom: 8,
+      color: "#111",
 
-    color: "#333",
+    },
 
-  },
+    oldPrice: {
 
-  sectionTitle: {
+      marginLeft: 12,
 
-    fontSize: 22,
+      textDecorationLine:
+        "line-through",
 
-    fontWeight: "bold",
+      color: "gray",
 
-    marginTop: 25,
+      fontSize: 18,
 
-    marginBottom: 12,
+    },
 
-  },
+    discount: {
 
-  description: {
+      marginLeft: 12,
 
-    color: "#555",
+      color: "green",
 
-    lineHeight: 22,
+      fontWeight: "bold",
 
-    fontSize: 15,
+    },
 
-  },
+    stock: {
 
-  deliveryBox: {
+      marginTop: 12,
 
-    backgroundColor: "white",
+      color: "green",
 
-    borderRadius: 18,
+      fontWeight: "bold",
 
-    padding: 18,
+      fontSize: 16,
 
-    marginTop: 25,
+    },
 
-    flexDirection: "row",
+    offerBox: {
 
-    alignItems: "center",
+      backgroundColor:
+        "white",
 
-  },
+      borderRadius: 20,
 
-  deliveryText: {
+      padding: 18,
 
-    marginLeft: 12,
+      marginTop: 22,
 
-    fontWeight: "600",
+      elevation: 2,
 
-  },
+    },
 
-  bottomBar: {
+    offerTitle: {
 
-    backgroundColor: "white",
+      fontSize: 18,
 
-    padding: 16,
+      fontWeight: "bold",
 
-    flexDirection: "row",
+      marginBottom: 10,
 
-    justifyContent: "space-between",
+    },
 
-    borderTopLeftRadius: 24,
+    offer: {
 
-    borderTopRightRadius: 24,
+      color: "#333",
 
-    elevation: 10,
+      marginBottom: 8,
 
-  },
+    },
 
-  cartButton: {
+    sectionTitle: {
 
-    flex: 1,
+      fontSize: 24,
 
-    backgroundColor: "#2874f0",
+      fontWeight: "bold",
 
-    marginRight: 10,
+      marginTop: 28,
 
-    borderRadius: 18,
+      marginBottom: 12,
 
-    paddingVertical: 16,
+    },
 
-    flexDirection: "row",
+    description: {
 
-    justifyContent: "center",
+      color: "#555",
 
-    alignItems: "center",
+      lineHeight: 24,
 
-  },
+      fontSize: 15,
 
-  buyButton: {
+    },
 
-    flex: 1,
+    deliveryBox: {
 
-    backgroundColor: "#fb641b",
+      backgroundColor:
+        "white",
 
-    borderRadius: 18,
+      borderRadius: 20,
 
-    paddingVertical: 16,
+      padding: 18,
 
-    justifyContent: "center",
+      marginTop: 25,
 
-    alignItems: "center",
+      flexDirection: "row",
 
-  },
+      alignItems: "center",
 
-  buttonText: {
+      elevation: 2,
 
-    color: "white",
+    },
 
-    fontWeight: "bold",
+    bottomBar: {
 
-    fontSize: 16,
+      backgroundColor:
+        "white",
 
-    marginLeft: 8,
+      padding: 16,
 
-  },
+      flexDirection: "row",
 
-});
+      justifyContent:
+        "space-between",
+
+      borderTopLeftRadius: 28,
+
+      borderTopRightRadius: 28,
+
+      elevation: 15,
+
+    },
+
+    cartButton: {
+
+      flex: 1,
+
+      backgroundColor:
+        "#2874f0",
+
+      marginRight: 10,
+
+      borderRadius: 18,
+
+      paddingVertical: 16,
+
+      flexDirection: "row",
+
+      justifyContent:
+        "center",
+
+      alignItems: "center",
+
+    },
+
+    buyButton: {
+
+      flex: 1,
+
+      backgroundColor:
+        "#fb641b",
+
+      borderRadius: 18,
+
+      paddingVertical: 16,
+
+      justifyContent:
+        "center",
+
+      alignItems: "center",
+
+    },
+
+    buttonText: {
+
+      color: "white",
+
+      fontWeight: "bold",
+
+      fontSize: 16,
+
+      marginLeft: 8,
+
+    },
+
+  });

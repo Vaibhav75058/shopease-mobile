@@ -50,7 +50,35 @@ export default function ProductsScreen() {
 
   const [description, setDescription] =
     useState("");
+  const [
+    originalPrice,
+    setOriginalPrice,
+  ] = useState("");
 
+  const [
+    discountPercent,
+    setDiscountPercent,
+  ] = useState("");
+
+  const [
+    rating,
+    setRating,
+  ] = useState("");
+
+  const [
+    numReviews,
+    setNumReviews,
+  ] = useState("");
+
+  const [
+    deliveryDays,
+    setDeliveryDays,
+  ] = useState("");
+
+  const [
+    offers,
+    setOffers,
+  ] = useState("");
   const [editingId, setEditingId] =
     useState(null);
 
@@ -109,6 +137,22 @@ export default function ProductsScreen() {
         image,
 
         description,
+
+        originalPrice,
+
+        discountPercent,
+
+        rating,
+
+        numReviews,
+
+        deliveryDays,
+
+        offers:
+          offers.split(","),
+
+        inStock:
+          stock > 0,
 
       };
 
@@ -256,7 +300,59 @@ export default function ProductsScreen() {
           value={image}
           onChangeText={setImage}
         />
+        <TextInput
+          placeholder="Original Price"
+          style={styles.input}
+          value={originalPrice}
+          onChangeText={
+            setOriginalPrice
+          }
+        />
 
+        <TextInput
+          placeholder="Discount %"
+          style={styles.input}
+          value={discountPercent}
+          onChangeText={
+            setDiscountPercent
+          }
+        />
+
+        <TextInput
+          placeholder="Rating (4.4)"
+          style={styles.input}
+          value={rating}
+          onChangeText={
+            setRating
+          }
+        />
+
+        <TextInput
+          placeholder="Reviews Count"
+          style={styles.input}
+          value={numReviews}
+          onChangeText={
+            setNumReviews
+          }
+        />
+
+        <TextInput
+          placeholder="Delivery Days"
+          style={styles.input}
+          value={deliveryDays}
+          onChangeText={
+            setDeliveryDays
+          }
+        />
+
+        <TextInput
+          placeholder="Offers (comma separated)"
+          style={styles.input}
+          value={offers}
+          onChangeText={
+            setOffers
+          }
+        />
         <TextInput
           placeholder="Description"
           style={[
@@ -352,7 +448,39 @@ export default function ProductsScreen() {
                   setDescription(
                     item.description
                   );
+                  setOriginalPrice(
+                    String(
+                      item.originalPrice || ""
+                    )
+                  );
 
+                  setDiscountPercent(
+                    String(
+                      item.discountPercent || ""
+                    )
+                  );
+
+                  setRating(
+                    String(
+                      item.rating || ""
+                    )
+                  );
+
+                  setNumReviews(
+                    String(
+                      item.numReviews || ""
+                    )
+                  );
+
+                  setDeliveryDays(
+                    item.deliveryDays || ""
+                  );
+
+                  setOffers(
+                    item.offers
+                      ? item.offers.join(",")
+                      : ""
+                  );
                 }}
 
               >

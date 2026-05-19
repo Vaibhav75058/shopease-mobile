@@ -41,8 +41,6 @@ export default function ProfileScreen({
 
     switch (title) {
 
-      
-
       case "My Orders":
 
         navigation.navigate(
@@ -61,23 +59,20 @@ export default function ProfileScreen({
 
       case "Saved Address":
 
-        Alert.alert(
-          "Saved Address 📍",
-          "Address management coming soon."
+        navigation.navigate(
+          "SavedAddresses"
         );
 
         break;
 
       case "Help Center":
 
-        Alert.alert(
-          "Help Center ☎️",
-          "Support feature coming soon."
-        );
+  navigation.navigate(
+    "HelpCenter"
+  );
 
-        break;
+  break;
 
-      
         break;
 
       default:
@@ -88,8 +83,6 @@ export default function ProfileScreen({
   };
 
   const menuItems = [
-
-  
 
     {
       title: "My Orders",
@@ -111,7 +104,6 @@ export default function ProfileScreen({
       icon: "help-circle-outline",
     },
 
-    
   ];
 
   const handleLogout = () => {
@@ -182,8 +174,6 @@ export default function ProfileScreen({
 
         </View>
 
-        
-
         {/* MENU */}
 
         <View style={styles.menuContainer}>
@@ -252,7 +242,7 @@ export default function ProfileScreen({
 
         </TouchableOpacity>
 
-        {/* APP VERSION */}
+        {/* VERSION */}
 
         <Text style={styles.version}>
           ShopEase v1.0.0
@@ -321,52 +311,6 @@ const styles = StyleSheet.create({
     marginTop: 6,
 
     fontSize: 15,
-
-  },
-
-  statsContainer: {
-
-    flexDirection: "row",
-
-    justifyContent: "space-between",
-
-    marginHorizontal: 18,
-
-    marginTop: -30,
-
-  },
-
-  statCard: {
-
-    backgroundColor: "white",
-
-    width: "31%",
-
-    borderRadius: 18,
-
-    paddingVertical: 18,
-
-    alignItems: "center",
-
-    elevation: 3,
-
-  },
-
-  statNumber: {
-
-    fontSize: 24,
-
-    fontWeight: "bold",
-
-    color: "#2874f0",
-
-  },
-
-  statLabel: {
-
-    marginTop: 5,
-
-    color: "gray",
 
   },
 

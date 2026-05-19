@@ -10,6 +10,7 @@ import {
   StyleSheet,
   ActivityIndicator,
   Image,
+  TouchableOpacity,
 } from "react-native";
 
 import axios from "axios";
@@ -22,8 +23,11 @@ import {
   useAuth,
 } from "../src/context/AuthContext";
 
-export default function MyOrdersScreen() {
+export default function MyOrdersScreen({
 
+  navigation,
+
+}) {
   const auth =
     useAuth();
 
@@ -136,7 +140,25 @@ export default function MyOrdersScreen() {
 
         renderItem={({ item }) => (
 
-          <View style={styles.card}>
+          <TouchableOpacity
+
+            style={styles.card}
+
+            onPress={() =>
+
+              navigation.navigate(
+
+                "OrderDetails",
+
+                {
+                  order: item,
+                }
+
+              )
+
+            }
+
+          >
 
             {/* PRODUCT IMAGE */}
 
@@ -188,8 +210,8 @@ export default function MyOrdersScreen() {
 
             </View>
 
-          </View>
 
+          </TouchableOpacity>
         )}
 
       />

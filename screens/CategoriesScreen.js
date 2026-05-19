@@ -1,4 +1,5 @@
 import React, {
+  useEffect,
   useState,
 } from "react";
 
@@ -9,125 +10,479 @@ import {
   TouchableOpacity,
   FlatList,
   Image,
+  ScrollView,
 } from "react-native";
 
 import {
   SafeAreaView,
 } from "react-native-safe-area-context";
 
-import categories
-  from "../src/data/categories";
+import axios from "axios";
 
-export default function CategoriesScreen() {
+import Ionicons
+  from "@expo/vector-icons/Ionicons";
+
+export default function CategoriesScreen({
+
+  navigation,
+
+}) {
+
+  const [
+    categories,
+    setCategories,
+  ] = useState([]);
 
   const [
     selectedCategory,
     setSelectedCategory,
-  ] = useState(
-    categories[0]
-  );
+  ] = useState("");
+
+  const [
+    products,
+    setProducts,
+  ] = useState([]);
+
+  /* FETCH CATEGORIES */
+
+  useEffect(() => {
+
+    fetchCategories();
+
+  }, []);
+
+  const fetchCategories =
+    async () => {
+
+      try {
+
+        const res =
+          await axios.get(
+
+            "https://e-commerce-mern-stack-0okr.onrender.com/api/products/categories/all"
+
+          );
+
+        setCategories(
+          res.data
+        );
+
+        if (
+          res.data.length > 0
+        ) {
+
+          setSelectedCategory(
+            res.data[0]
+          );
+
+          fetchProducts(
+            res.data[0]
+          );
+
+        }
+
+      } catch (error) {
+
+        console.log(error);
+
+      }
+
+    };
+
+  /* FETCH PRODUCTS */
+
+  const fetchProducts =
+    async (category) => {
+
+      try {
+
+        const response =
+          await axios.get(
+
+            "https://e-commerce-mern-stack-0okr.onrender.com/api/products"
+
+          );
+
+        const filtered =
+          response.data.filter(
+
+            (item) =>
+
+              item.category
+                ?.toLowerCase()
+
+                ===
+
+              category
+                ?.toLowerCase()
+
+          );
+
+        setProducts(
+          filtered
+        );
+
+      } catch (error) {
+
+        console.log(error);
+
+      }
+
+    };
+
+  /* CATEGORY CLICK */
+
+  const handleCategory =
+    (category) => {
+
+      setSelectedCategory(
+        category
+      );
+
+      fetchProducts(
+        category
+      );
+
+    };
+
+  /* CATEGORY IMAGE */
+
+  const getCategoryImage =
+    (category) => {
+
+      const lower =
+        category.toLowerCase();
+
+      if (
+        lower.includes(
+          "fashion"
+        )
+      ) {
+
+        return "https://cdn-icons-png.flaticon.com/512/892/892458.png";
+
+      }
+
+      if (
+        lower.includes(
+          "electronics"
+        )
+      ) {
+
+        return "https://cdn-icons-png.flaticon.com/512/3659/3659898.png";
+
+      }
+
+      if (
+        lower.includes(
+          "beauty"
+        )
+      ) {
+
+        return "https://cdn-icons-png.flaticon.com/512/3163/3163203.png";
+
+      }
+
+      if (
+        lower.includes(
+          "health"
+        )
+      ) {
+
+        return "https://cdn-icons-png.flaticon.com/512/2966/2966486.png";
+
+      }
+
+      if (
+        lower.includes(
+          "home"
+        )
+      ) {
+
+        return "https://cdn-icons-png.flaticon.com/512/1046/1046857.png";
+
+      }
+
+      return "https://cdn-icons-png.flaticon.com/512/3081/3081559.png";
+
+    };
 
   return (
 
     <SafeAreaView
-      edges={["top"]}
       style={styles.container}
+      edges={["top"]}
     >
 
-      {/* LEFT SIDEBAR */}
+      {/* HEADER */}
 
-      <View style={styles.sidebar}>
+      <View
+        style={styles.header}
+      >
 
-        <FlatList
+        <Text
+          style={styles.heading}
+        >
 
-          data={categories}
+          All Categories
 
-          keyExtractor={(item) =>
-            item.id.toString()
-          }
+        </Text>
 
-          showsVerticalScrollIndicator={
-            false
-          }
+        <View
+          style={styles.icons}
+        >
 
-          renderItem={({ item }) => (
+          <Ionicons
 
-            <TouchableOpacity
+            name="search"
 
-              style={[
+            size={28}
 
-                styles.sidebarItem,
+            color="#111"
 
-                selectedCategory.id ===
-                item.id &&
+          />
 
-                styles.activeSidebar,
+          <Ionicons
 
-              ]}
+            name="camera"
 
-              onPress={() =>
-                setSelectedCategory(
-                  item
-                )
-              }
+            size={28}
 
-            >
+            color="#111"
 
-              <Image
+            style={{
+              marginLeft: 18,
+            }}
 
-                source={{
-                  uri: item.image,
-                }}
+          />
 
-                style={styles.sidebarImage}
-
-              />
-
-              <Text
-                style={styles.sidebarText}
-              >
-
-                {item.name}
-
-              </Text>
-
-            </TouchableOpacity>
-
-          )}
-
-        />
+        </View>
 
       </View>
 
-      {/* RIGHT CONTENT */}
+      <View
+        style={styles.main}
+      >
 
-      <View style={styles.content}>
+        {/* SIDEBAR */}
 
-        <Text style={styles.heading}>
-          {selectedCategory.name}
-        </Text>
+        <View
+          style={styles.sidebar}
+        >
 
-        <Image
+          <ScrollView
+            showsVerticalScrollIndicator={
+              false
+            }
+          >
 
-          source={{
-            uri:
-              selectedCategory.image,
-          }}
+            {
 
-          style={styles.banner}
+              categories.map(
+                (
+                  item,
+                  index
+                ) => (
 
-        />
+                  <TouchableOpacity
 
-        <View style={styles.grid}>
+                    key={index}
 
-          {[1, 2, 3, 4].map(
-            (_, index) => (
+                    style={[
+
+                      styles.categoryItem,
+
+                      selectedCategory ===
+                        item &&
+
+                      styles.activeCategory,
+
+                    ]}
+
+                    onPress={() =>
+                      handleCategory(
+                        item
+                      )
+                    }
+
+                  >
+
+                    <Image
+
+                      source={{
+                        uri:
+                          getCategoryImage(
+                            item
+                          ),
+                      }}
+
+                      style={
+                        styles.categoryImage
+                      }
+
+                    />
+
+                    <Text
+
+                      style={[
+
+                        styles.categoryText,
+
+                        selectedCategory ===
+                          item && {
+
+                          color:
+                            "#2874f0",
+
+                          fontWeight:
+                            "bold",
+
+                        },
+
+                      ]}
+
+                    >
+
+                      {item}
+
+                    </Text>
+
+                  </TouchableOpacity>
+
+                )
+              )
+
+            }
+
+          </ScrollView>
+
+        </View>
+
+        {/* RIGHT CONTENT */}
+
+        <View
+          style={styles.content}
+        >
+
+          {/* BANNER */}
+
+          <View
+            style={styles.banner}
+          >
+
+            <View>
+
+              <Text
+                style={
+                  styles.bannerTitle
+                }
+              >
+
+                {
+                  selectedCategory
+                }
+
+              </Text>
 
               <TouchableOpacity
 
-                key={index}
+                style={
+                  styles.shopNow
+                }
 
-                style={styles.card}
+              >
+
+                <Ionicons
+
+                  name="arrow-forward"
+
+                  size={18}
+
+                  color="white"
+
+                />
+
+              </TouchableOpacity>
+
+            </View>
+
+            <Image
+
+              source={{
+                uri:
+                  "https://images.unsplash.com/photo-1523381210434-271e8be1f52b",
+
+              }}
+
+              style={
+                styles.bannerImage
+              }
+
+            />
+
+          </View>
+
+          {/* PRODUCTS */}
+
+          <Text
+            style={
+              styles.sectionTitle
+            }
+          >
+
+            Products
+
+          </Text>
+
+          <FlatList
+
+            data={products}
+
+            keyExtractor={(
+              item
+            ) =>
+              item._id
+            }
+
+            numColumns={2}
+
+            showsVerticalScrollIndicator={
+              false
+            }
+
+            contentContainerStyle={{
+              paddingBottom: 220,
+            }}
+
+            columnWrapperStyle={{
+              justifyContent:
+                "space-between",
+            }}
+
+            renderItem={({
+              item,
+            }) => (
+
+              <TouchableOpacity
+
+                style={
+                  styles.productCard
+                }
+
+                onPress={() =>
+
+                  navigation.navigate(
+
+                    "ProductDetails",
+
+                    {
+                      product:
+                        item,
+                    }
+
+                  )
+
+                }
 
               >
 
@@ -135,27 +490,44 @@ export default function CategoriesScreen() {
 
                   source={{
                     uri:
-                      selectedCategory.image,
+                      item.image,
                   }}
 
-                  style={styles.cardImage}
+                  style={
+                    styles.productImage
+                  }
 
                 />
 
                 <Text
-                  style={styles.cardText}
+
+                  numberOfLines={2}
+
+                  style={
+                    styles.productName
+                  }
+
                 >
 
-                  {
-                    selectedCategory.name
+                  {item.name}
+
+                </Text>
+
+                <Text
+                  style={
+                    styles.productPrice
                   }
+                >
+
+                  ₹ {item.price}
 
                 </Text>
 
               </TouchableOpacity>
 
-            )
-          )}
+            )}
+
+          />
 
         </View>
 
@@ -167,149 +539,273 @@ export default function CategoriesScreen() {
 
 }
 
-const styles = StyleSheet.create({
+const styles =
+  StyleSheet.create({
 
-  container: {
+    container: {
 
-    flex: 1,
+      flex: 1,
 
-    flexDirection: "row",
+      backgroundColor:
+        "#fff",
 
-    backgroundColor: "#f5f7fb",
+      paddingTop: 5,
 
-  },
+    },
 
-  sidebar: {
+    /* HEADER */
 
-    width: 100,
+    header: {
 
-    backgroundColor: "white",
+      flexDirection: "row",
 
-    paddingTop: 10,
+      justifyContent:
+        "space-between",
 
-  },
+      alignItems: "center",
 
-  sidebarItem: {
+      paddingHorizontal: 18,
 
-    alignItems: "center",
+      paddingTop: 12,
 
-    paddingVertical: 16,
+      paddingBottom: 16,
 
-    borderLeftWidth: 4,
+      backgroundColor:
+        "white",
 
-    borderLeftColor:
-      "transparent",
+    },
 
-  },
+    heading: {
 
-  activeSidebar: {
+      fontSize: 22,
 
-    backgroundColor: "#eef4ff",
+      fontWeight: "bold",
 
-    borderLeftColor:
-      "#2874f0",
+      color: "#111",
 
-  },
+    },
 
-  sidebarImage: {
+    icons: {
 
-    width: 40,
+      flexDirection: "row",
 
-    height: 40,
+      alignItems: "center",
 
-    resizeMode: "contain",
+    },
 
-  },
+    /* MAIN */
 
-  sidebarText: {
+    main: {
 
-    fontSize: 12,
+      flex: 1,
 
-    marginTop: 6,
+      flexDirection: "row",
 
-    textAlign: "center",
+    },
 
-    fontWeight: "600",
+    /* SIDEBAR */
 
-  },
+    sidebar: {
 
-  content: {
+      width: 95,
 
-    flex: 1,
+      backgroundColor:
+        "#f5f6fa",
 
-    padding: 15,
+      borderRightWidth: 1,
 
-  },
+      borderRightColor:
+        "#eee",
 
-  heading: {
+    },
 
-    fontSize: 24,
+    categoryItem: {
 
-    fontWeight: "bold",
+      alignItems: "center",
 
-    marginBottom: 15,
+      paddingVertical: 16,
 
-  },
+      borderBottomWidth: 1,
 
-  banner: {
+      borderBottomColor:
+        "#eee",
 
-    width: "100%",
+    },
 
-    height: 150,
+    activeCategory: {
 
-    borderRadius: 18,
+      backgroundColor:
+        "white",
 
-    resizeMode: "cover",
+      borderLeftWidth: 4,
 
-    marginBottom: 20,
+      borderLeftColor:
+        "#2874f0",
 
-  },
+    },
 
-  grid: {
+    categoryImage: {
 
-    flexDirection: "row",
+      width: 52,
 
-    flexWrap: "wrap",
+      height: 52,
 
-    justifyContent:
-      "space-between",
+      borderRadius: 30,
 
-  },
+      resizeMode:
+        "contain",
 
-  card: {
+      marginBottom: 10,
 
-    width: "47%",
+      backgroundColor:
+        "#eef4ff",
 
-    backgroundColor: "white",
+    },
 
-    borderRadius: 18,
+    categoryText: {
 
-    padding: 12,
+      fontSize: 13,
 
-    marginBottom: 16,
+      textAlign: "center",
 
-    alignItems: "center",
+      color: "#666",
 
-    elevation: 2,
+      paddingHorizontal: 4,
 
-  },
+    },
 
-  cardImage: {
+    /* RIGHT */
 
-    width: 60,
+    content: {
 
-    height: 60,
+      flex: 1,
 
-    resizeMode: "contain",
+      padding: 15,
 
-  },
+    },
 
-  cardText: {
+    /* BANNER */
 
-    marginTop: 10,
+    banner: {
 
-    fontWeight: "600",
+      backgroundColor:
+        "#eef3ff",
 
-  },
+      borderRadius: 24,
 
-});
+      padding: 18,
+
+      flexDirection: "row",
+
+      justifyContent:
+        "space-between",
+
+      alignItems: "center",
+
+      marginBottom: 25,
+
+    },
+
+    bannerTitle: {
+
+      fontSize: 28,
+
+      fontWeight: "bold",
+
+      color: "#111",
+
+    },
+
+    shopNow: {
+
+      width: 40,
+
+      height: 40,
+
+      borderRadius: 20,
+
+      backgroundColor:
+        "#111",
+
+      justifyContent:
+        "center",
+
+      alignItems:
+        "center",
+
+      marginTop: 14,
+
+    },
+
+    bannerImage: {
+
+      width: 110,
+
+      height: 110,
+
+      borderRadius: 18,
+
+    },
+
+    /* PRODUCTS */
+
+    sectionTitle: {
+
+      fontSize: 20,
+
+      fontWeight: "bold",
+
+      marginBottom: 18,
+
+      color: "#111",
+
+    },
+
+    productCard: {
+
+      width: "48%",
+
+      marginBottom: 18,
+
+    },
+
+    productImage: {
+
+      width: "100%",
+
+      height: 135,
+
+      borderRadius: 18,
+
+      backgroundColor:
+        "#f4f4f4",
+
+    },
+
+    productName: {
+
+      fontSize: 14,
+
+      fontWeight: "600",
+
+      color: "#111",
+
+      marginTop: 10,
+
+      minHeight: 38,
+
+    },
+
+    productPrice: {
+
+      fontSize: 17,
+
+      fontWeight: "bold",
+
+      color: "#2874f0",
+
+      marginTop: 6,
+
+    },
+
+  });

@@ -14,9 +14,18 @@ import CategoriesScreen
 import WishlistScreen
   from "./screens/WishlistScreen";
 
+import OrderDetailsScreen
+  from "./screens/OrderDetailsScreen";
+import HelpCenterScreen
+  from "./screens/HelpCenterScreen";
+
+import SavedAddressesScreen from "./screens/SavedAddressesScreen";
+
+import AddAddressScreen from "./screens/AddAddressScreen";
+
 import NotificationsScreen
-from "./screens/NotificationsScreen";
-  
+  from "./screens/NotificationsScreen";
+
 import {
   View,
   TouchableOpacity,
@@ -46,6 +55,9 @@ import HomeScreen
 
 import ProductDetailsScreen
   from "./screens/ProductDetailsScreen";
+
+import CategoryProductsScreen
+  from "./screens/CategoryProductsScreen";
 
 import LoginScreen
   from "./screens/LoginScreen";
@@ -365,6 +377,27 @@ function MainNavigator() {
             component={
               ProductDetailsScreen
             }
+            options={{
+              headerShown: false,
+            }}
+          />
+          <Stack.Screen
+
+            name="OrderDetails"
+
+            component={
+              OrderDetailsScreen
+            }
+
+          />
+          <Stack.Screen
+
+            name="CategoryProducts"
+
+            component={
+              CategoryProductsScreen
+            }
+
           />
 
           <Stack.Screen
@@ -386,6 +419,29 @@ function MainNavigator() {
             component={
               WishlistScreen
             }
+          />
+
+          <Stack.Screen
+
+            name="SavedAddresses"
+
+            component={
+              SavedAddressesScreen
+            }
+
+          />
+          <Stack.Screen
+            name="HelpCenter"
+            component={HelpCenterScreen}
+          />
+          <Stack.Screen
+
+            name="AddAddress"
+
+            component={
+              AddAddressScreen
+            }
+
           />
           <Stack.Screen
 

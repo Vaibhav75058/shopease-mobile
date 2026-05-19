@@ -3,15 +3,11 @@ import React from "react";
 import {
   View,
   Text,
-  StyleSheet,
   FlatList,
   Image,
   TouchableOpacity,
+  StyleSheet,
 } from "react-native";
-
-import {
-  SafeAreaView,
-} from "react-native-safe-area-context";
 
 import Ionicons
   from "@expo/vector-icons/Ionicons";
@@ -20,311 +16,324 @@ import {
   useWishlist,
 } from "../src/context/WishlistContext";
 
-import {
-  useCart,
-} from "../src/context/CartContext";
-
 export default function WishlistScreen({
 
   navigation,
 
 }) {
 
-  const wishlist =
-    useWishlist();
+  const {
 
-  const wishlistItems =
-    wishlist?.wishlistItems || [];
+    wishlist,
 
-  const removeFromWishlist =
-    wishlist?.removeFromWishlist;
+    removeFromWishlist,
 
-  const cart = useCart();
-
-  const addToCart =
-    cart?.addToCart;
-
-  if (
-    wishlistItems.length === 0
-  ) {
-
-    return (
-
-      <SafeAreaView
-        style={styles.emptyContainer}
-      >
-
-        <Ionicons
-          name="heart-outline"
-          size={100}
-          color="#ccc"
-        />
-
-        <Text style={styles.emptyText}>
-          Wishlist is empty
-        </Text>
-
-      </SafeAreaView>
-
-    );
-
-  }
+  } = useWishlist();
 
   return (
 
-    <SafeAreaView
-      edges={["top"]}
+    <View
       style={styles.container}
     >
 
-      <FlatList
+      {/* HEADER */}
 
-        data={wishlistItems}
+      <Text
+        style={styles.heading}
+      >
 
-        keyExtractor={(item) =>
-          item._id
-        }
+        My Wishlist ❤️
 
-        showsVerticalScrollIndicator={
-          false
-        }
+      </Text>
 
-        contentContainerStyle={{
-          padding: 15,
-          paddingBottom: 100,
-        }}
+      {
 
-        renderItem={({ item }) => (
+        wishlist.length ===
+          0 ? (
 
-          <TouchableOpacity
-
-            style={styles.card}
-
-            onPress={() =>
-              navigation.navigate(
-                "ProductDetails",
-                {
-                  product: item,
-                }
-              )
+          <View
+            style={
+              styles.emptyContainer
             }
-
           >
 
-            <Image
+            <Ionicons
 
-              source={{
-                uri: item.image,
-              }}
+              name="heart-outline"
 
-              style={styles.image}
+              size={90}
+
+              color="#ccc"
 
             />
 
-            <View style={styles.info}>
+            <Text
+              style={
+                styles.emptyText
+              }
+            >
 
-              <Text
-                numberOfLines={1}
-                style={styles.name}
+              Wishlist is Empty
+
+            </Text>
+
+          </View>
+
+        ) : (
+
+          <FlatList
+
+            data={wishlist}
+
+            keyExtractor={(
+              item
+            ) =>
+              item._id
+            }
+
+            showsVerticalScrollIndicator={
+              false
+            }
+
+            renderItem={({
+              item,
+            }) => (
+
+              <TouchableOpacity
+
+                style={
+                  styles.card
+                }
+
+                onPress={() =>
+
+                  navigation.navigate(
+
+                    "ProductDetails",
+
+                    {
+                      product:
+                        item,
+                    }
+
+                  )
+
+                }
+
               >
 
-                {item.name}
+                {/* IMAGE */}
 
-              </Text>
+                <Image
 
-              <Text style={styles.price}>
-                ₹ {item.price}
-              </Text>
+                  source={{
+                    uri:
+                      item.image,
+                  }}
 
-              <View style={styles.actions}>
-
-                <TouchableOpacity
-
-                  style={styles.cartButton}
-
-                  onPress={() =>
-                    addToCart(item)
+                  style={
+                    styles.image
                   }
 
+                />
+
+                {/* INFO */}
+
+                <View
+                  style={
+                    styles.info
+                  }
                 >
 
                   <Text
+
+                    numberOfLines={2}
+
                     style={
-                      styles.cartText
+                      styles.name
                     }
+
                   >
-                    Add to Cart
+
+                    {item.name}
+
                   </Text>
 
-                </TouchableOpacity>
+                  <Text
+                    style={
+                      styles.price
+                    }
+                  >
+
+                    ₹ {item.price}
+
+                  </Text>
+
+                </View>
+
+                {/* DELETE */}
 
                 <TouchableOpacity
 
                   style={
-                    styles.removeButton
+                    styles.deleteBtn
                   }
 
                   onPress={() =>
+
                     removeFromWishlist(
                       item._id
                     )
+
                   }
 
                 >
 
                   <Ionicons
+
                     name="trash-outline"
+
                     size={22}
+
                     color="#e94560"
+
                   />
 
                 </TouchableOpacity>
 
-              </View>
+              </TouchableOpacity>
 
-            </View>
+            )}
 
-          </TouchableOpacity>
+          />
 
-        )}
+        )
 
-      />
+      }
 
-    </SafeAreaView>
+    </View>
 
   );
 
 }
 
-const styles = StyleSheet.create({
+const styles =
+  StyleSheet.create({
 
-  container: {
+    container: {
 
-    flex: 1,
+      flex: 1,
 
-    backgroundColor: "#f5f7fb",
+      backgroundColor:
+        "#f5f7fb",
 
-  },
+      padding: 15,
 
-  emptyContainer: {
+    },
 
-    flex: 1,
+    heading: {
 
-    justifyContent: "center",
+      fontSize: 30,
 
-    alignItems: "center",
+      fontWeight: "bold",
 
-    backgroundColor: "white",
+      marginBottom: 20,
 
-  },
+      color: "#111",
 
-  emptyText: {
+    },
 
-    marginTop: 20,
+    card: {
 
-    fontSize: 22,
+      backgroundColor:
+        "white",
 
-    fontWeight: "bold",
+      borderRadius: 20,
 
-    color: "#888",
+      padding: 14,
 
-  },
+      marginBottom: 16,
 
-  card: {
+      flexDirection: "row",
 
-    backgroundColor: "white",
+      alignItems: "center",
 
-    borderRadius: 22,
+      elevation: 3,
 
-    flexDirection: "row",
+    },
 
-    padding: 12,
+    image: {
 
-    marginBottom: 16,
+      width: 90,
 
-    elevation: 2,
+      height: 90,
 
-  },
+      borderRadius: 15,
 
-  image: {
+      resizeMode: "cover",
 
-    width: 110,
+    },
 
-    height: 110,
+    info: {
 
-    borderRadius: 18,
+      flex: 1,
 
-  },
+      marginLeft: 15,
 
-  info: {
+    },
 
-    flex: 1,
+    name: {
 
-    marginLeft: 12,
+      fontSize: 16,
 
-    justifyContent: "space-between",
+      fontWeight: "600",
 
-  },
+      color: "#111",
 
-  name: {
+    },
 
-    fontSize: 17,
+    price: {
 
-    fontWeight: "bold",
+      fontSize: 20,
 
-    color: "#111",
+      fontWeight: "bold",
 
-  },
+      color: "#2874f0",
 
-  price: {
+      marginTop: 10,
 
-    fontSize: 22,
+    },
 
-    fontWeight: "bold",
+    deleteBtn: {
 
-    color: "#2874f0",
+      padding: 10,
 
-    marginTop: 6,
+    },
 
-  },
+    emptyContainer: {
 
-  actions: {
+      flex: 1,
 
-    flexDirection: "row",
+      justifyContent:
+        "center",
 
-    alignItems: "center",
+      alignItems:
+        "center",
 
-    justifyContent:
-      "space-between",
+      marginTop: 100,
 
-    marginTop: 15,
+    },
 
-  },
+    emptyText: {
 
-  cartButton: {
+      fontSize: 22,
 
-    backgroundColor: "#2874f0",
+      fontWeight: "bold",
 
-    paddingHorizontal: 18,
+      color: "gray",
 
-    paddingVertical: 10,
+      marginTop: 15,
 
-    borderRadius: 12,
+    },
 
-  },
-
-  cartText: {
-
-    color: "white",
-
-    fontWeight: "bold",
-
-  },
-
-  removeButton: {
-
-    padding: 8,
-
-  },
-
-});
+  });

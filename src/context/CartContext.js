@@ -75,7 +75,81 @@ export const CartProvider = ({ children }) => {
     );
 
   };
+/* INCREASE QTY */
 
+const increaseQty =
+  async (id) => {
+
+    const updatedCart =
+      cartItems.map((item) =>
+
+        item._id === id
+
+          ? {
+              ...item,
+              qty: item.qty + 1,
+            }
+
+          : item
+
+      );
+
+    setCartItems(
+      updatedCart
+    );
+
+    await AsyncStorage.setItem(
+
+      "cartItems",
+
+      JSON.stringify(
+        updatedCart
+      )
+
+    );
+
+  };
+
+/* DECREASE QTY */
+
+const decreaseQty =
+  async (id) => {
+
+    let updatedCart =
+      cartItems.map((item) =>
+
+        item._id === id
+
+          ? {
+              ...item,
+              qty:
+
+                item.qty > 1
+
+                  ? item.qty - 1
+
+                  : 1,
+            }
+
+          : item
+
+      );
+
+    setCartItems(
+      updatedCart
+    );
+
+    await AsyncStorage.setItem(
+
+      "cartItems",
+
+      JSON.stringify(
+        updatedCart
+      )
+
+    );
+
+  };
   const removeFromCart = async (id) => {
 
     const updatedCart =
@@ -115,14 +189,24 @@ export const CartProvider = ({ children }) => {
 
     <CartContext.Provider
       value={{
-        cartItems,
-        addToCart,
-        removeFromCart,
-        clearCart,
-        totalItems,
-        totalPrice,
-        
-      }}
+
+  cartItems,
+
+  addToCart,
+
+  removeFromCart,
+
+  clearCart,
+
+  increaseQty,
+
+  decreaseQty,
+
+  totalItems,
+
+  totalPrice,
+
+}}
     >
 
       {children}
