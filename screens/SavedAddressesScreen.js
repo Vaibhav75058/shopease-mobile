@@ -5,6 +5,7 @@ import React, {
 import {
   View,
   Text,
+  Image,
   FlatList,
   TouchableOpacity,
   StyleSheet,
@@ -150,7 +151,7 @@ export default function SavedAddressesScreen({
       style={styles.container}
     >
 
-     
+
 
       {/* ADD BUTTON */}
 
@@ -166,12 +167,16 @@ export default function SavedAddressesScreen({
 
       >
 
-        <Ionicons
-          name="add"
-          size={22}
-          color="white"
-        />
 
+        <Image
+          source={require("../assets/icons/plus.png")}
+          style={{
+            width: 22,
+            height: 22,
+            tintColor: "white",
+            resizeMode: "contain",
+          }}
+        />
         <Text
           style={styles.addText}
         >
@@ -195,16 +200,15 @@ export default function SavedAddressesScreen({
             }
           >
 
-            <Ionicons
-
-              name="location-outline"
-
-              size={90}
-
-              color="#ccc"
-
+            <Image
+              source={require("../assets/icons/empty-location.png")}
+              style={{
+                width: 90,
+                height: 90,
+                tintColor: "#ccc",
+                resizeMode: "contain",
+              }}
             />
-
             <Text
               style={
                 styles.emptyTitle
@@ -251,23 +255,21 @@ export default function SavedAddressesScreen({
                   }
                 >
 
-                  <Ionicons
+                  <Image
+                    source={
+                      item.type === "Work"
 
-                    name={
-                      item.type ===
-                      "Work"
+                        ? require("../assets/icons/work.png")
 
-                        ? "business"
-
-                        : "home"
+                        : require("../assets/icons/home.png")
                     }
-
-                    size={18}
-
-                    color="#2874f0"
-
+                    style={{
+                      width: 18,
+                      height: 18,
+                      tintColor: "#2874f0",
+                      resizeMode: "contain",
+                    }}
                   />
-
                   <Text
                     style={
                       styles.typeText
@@ -358,12 +360,16 @@ export default function SavedAddressesScreen({
 
                   >
 
-                    <Ionicons
-                      name="create-outline"
-                      size={18}
-                      color="white"
-                    />
 
+                    <Image
+                      source={require("../assets/icons/edit.png")}
+                      style={{
+                        width: 18,
+                        height: 18,
+                        tintColor: "white",
+                        resizeMode: "contain",
+                      }}
+                    />
                     <Text
                       style={
                         styles.btnText
@@ -392,12 +398,15 @@ export default function SavedAddressesScreen({
 
                   >
 
-                    <Ionicons
-                      name="trash-outline"
-                      size={18}
-                      color="white"
+                    <Image
+                      source={require("../assets/icons/delete.png")}
+                      style={{
+                        width: 18,
+                        height: 18,
+                        tintColor: "white",
+                        resizeMode: "contain",
+                      }}
                     />
-
                     <Text
                       style={
                         styles.btnText
@@ -442,7 +451,7 @@ const styles =
 
     },
 
-  
+
 
     heading: {
 

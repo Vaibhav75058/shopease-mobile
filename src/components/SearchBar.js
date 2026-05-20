@@ -3,8 +3,10 @@ import React from "react";
 import {
   View,
   TextInput,
+ 
   StyleSheet,
   TouchableOpacity,
+  Image,
 } from "react-native";
 
 import Ionicons
@@ -21,10 +23,14 @@ export default function SearchBar({
 
     <View style={styles.container}>
 
-      <Ionicons
-        name="search"
-        size={24}
-        color="#666"
+      <Image
+        source={require("../../assets/icons/search.png")}
+        style={{
+          width: 24,
+          height: 24,
+          tintColor: "#666",
+          resizeMode: "contain",
+        }}
       />
 
       <TextInput
@@ -49,10 +55,14 @@ export default function SearchBar({
           }
         >
 
-          <Ionicons
-            name="close-circle"
-            size={22}
-            color="#777"
+          <Image
+            source={require("../../assets/icons/close.png")}
+            style={{
+              width: 22,
+              height: 22,
+              tintColor: "#777",
+              resizeMode: "contain",
+            }}
           />
 
         </TouchableOpacity>

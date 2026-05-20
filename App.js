@@ -1,6 +1,9 @@
 import "react-native-gesture-handler";
 
-import React from "react";
+import React, {
+  useEffect,
+  useState,
+} from "react";
 
 import {
 
@@ -29,6 +32,8 @@ import NotificationsScreen
 import {
   View,
   TouchableOpacity,
+  ActivityIndicator,
+  Image,
 } from "react-native";
 
 import {
@@ -49,6 +54,17 @@ import {
 
 import Ionicons
   from "@expo/vector-icons/Ionicons";
+
+  import * as Font
+  from "expo-font";
+
+import {
+  MaterialIcons,
+  Feather,
+  AntDesign,
+} from "@expo/vector-icons";
+
+
 
 import HomeScreen
   from "./screens/HomeScreen";
@@ -98,7 +114,20 @@ const Stack =
 
 const Tab =
   createBottomTabNavigator();
-
+const loadFonts = async () => {
+  try {
+    await Font.loadAsync({
+      ...Ionicons.font,
+      ...MaterialIcons.font,
+      ...Feather.font,
+      ...AntDesign.font,
+    });
+    return true;
+  } catch (error) {
+    console.log('Font load error:', error);
+    return true;
+  }
+};
 function BottomTabs({
   navigation,
 
@@ -165,44 +194,57 @@ function BottomTabs({
               route.name === "Home"
             ) {
 
-              iconName = "home";
+              iconName = "home-outline";
 
             } else if (
               route.name === "Categories"
             ) {
 
-              iconName = "grid";
+              iconName = "grid-outline";
 
             } else if (
               route.name === "Cart"
             ) {
 
-              iconName = "cart";
+              iconName = "cart-outline";
 
             } else if (
               route.name === "Account"
             ) {
 
-              iconName = "person";
+              iconName = "person-outline";
 
             } else if (
               route.name === "Admin"
             ) {
 
-              iconName =
-                "settings";
+              iconName = "settings-outline";
 
             }
 
             return (
-
-              <Ionicons
-                name={iconName}
-                size={24}
-                color={color}
-              />
-
-            );
+  <Image
+    source={
+      route.name === "Home"
+        ? require("./assets/icons/home.png")
+        : route.name === "Categories"
+        ? require("./assets/icons/categories.png")
+        : route.name === "Cart"
+        ? require("./assets/icons/cart.png")
+        : route.name === "Account"
+        ? require("./assets/icons/user-profile.png")
+        : route.name === "Admin"
+        ? require("./assets/icons/admin.png")
+        : require("./assets/icons/home.png")
+    }
+    style={{
+      width: 24,
+      height: 24,
+      tintColor: color,
+      resizeMode: "contain",
+    }}
+  />
+);
 
           },
 
@@ -266,55 +308,7 @@ function BottomTabs({
 
 
 
-      {
-        navigation
-          ?.getState()
-          ?.routes?.[
-          navigation.getState().index
-        ]?.state?.index === 0 && (
-
-          <TouchableOpacity
-
-            style={{
-
-              position: "absolute",
-
-              bottom: 90,
-
-              right: 20,
-
-              backgroundColor: "#2874f0",
-
-              width: 65,
-
-              height: 65,
-
-              borderRadius: 40,
-
-              justifyContent: "center",
-
-              alignItems: "center",
-
-              elevation: 10,
-
-            }}
-
-            onPress={() =>
-              navigation.navigate("ChatBot")
-            }
-
-          >
-
-            <Ionicons
-              name="chatbubble"
-              size={30}
-              color="white"
-            />
-
-          </TouchableOpacity>
-
-        )
-      }
+      
     </View>
 
   );
@@ -518,32 +512,88 @@ function MainNavigator() {
 
 export default function App() {
 
-  return (
-    <NotificationProvider>
+  const [
+
+    fontsLoaded,
+
+    setFontsLoaded,
+
+  ] = useState(false);
+
+  useEffect(() => {
+
+  const prepare = async () => {
+
+    await loadFonts();
+
+    setFontsLoaded(true);
+
+  };
+
+  prepare();
+
+}, []);
+
+  
+
+    if (!fontsLoaded) {
+  
+      return (
+  
+        <View
+  
+          style={{
+  
+            flex: 1,
+  
+            justifyContent:
+              "center",
+  
+            alignItems:
+              "center",
+  
+          }}
+  
+        >
+  
+          <ActivityIndicator
+  
+            size="large"
+  
+            color="#2874f0"
+  
+          />
+  
+        </View>
+  
+      );
+  
+    }
+  
+    return (
+  
       <AuthProvider>
-
-        <WishlistProvider>
-
-          <CartProvider>
-
-            <NavigationContainer>
-
-              <>
-
+  
+        <CartProvider>
+  
+          <WishlistProvider>
+  
+            <NotificationProvider>
+  
+              <NavigationContainer>
+  
                 <MainNavigator />
-
-
-
-              </>
-
-            </NavigationContainer>
-
-          </CartProvider>
-
-        </WishlistProvider>
-
+  
+              </NavigationContainer>
+  
+            </NotificationProvider>
+  
+          </WishlistProvider>
+  
+        </CartProvider>
+  
       </AuthProvider>
-    </NotificationProvider>
-  );
-
-}
+  
+    );
+  
+  }

@@ -6,6 +6,7 @@ import React, {
 import {
   View,
   Text,
+  Image,
   TouchableOpacity,
   StyleSheet,
   TextInput,
@@ -290,10 +291,14 @@ export default function AddAddressScreen({
 
       >
 
-        <Ionicons
-          name="location"
-          size={22}
-          color="white"
+        <Image
+          source={require("../assets/icons/map.png")}
+          style={{
+            width: 22,
+            height: 22,
+            // tintColor: "white",
+            resizeMode: "contain",
+          }}
         />
 
         <Text

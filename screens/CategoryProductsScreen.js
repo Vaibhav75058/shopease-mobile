@@ -17,7 +17,6 @@ import axios from "axios";
 export default function CategoryProductsScreen({
 
   route,
-
   navigation,
 
 }) {
@@ -55,8 +54,6 @@ export default function CategoryProductsScreen({
             "https://e-commerce-mern-stack-0okr.onrender.com/api/products"
 
           );
-
-        /* FILTER CATEGORY */
 
         const filtered =
           response.data.filter(
@@ -100,78 +97,227 @@ export default function CategoryProductsScreen({
 
       <TouchableOpacity
 
+        activeOpacity={0.92}
+
         style={styles.card}
 
         onPress={() =>
 
-         navigation.navigate(
+          navigation.navigate(
 
-  "ProductDetails",
+            "ProductDetails",
 
-  {
-    product: item,
-  }
+            {
+              product: item,
+            }
 
-)
+          )
 
         }
 
       >
 
-        {/* IMAGE */}
-
-        <Image
-
-          source={{
-            uri:
-              item.image,
-          }}
-
-          style={styles.image}
-
-        />
-
-        {/* NAME */}
-
-        <Text
-
-          numberOfLines={2}
-
-          style={styles.name}
-
-        >
-
-          {item.name}
-
-        </Text>
-
-        {/* PRICE */}
-
-        <Text
-          style={styles.price}
-        >
-
-          ₹ {item.price}
-
-        </Text>
-
-        {/* CATEGORY */}
+        {/* IMAGE CONTAINER */}
 
         <View
-          style={
-            styles.categoryBox
-          }
+          style={styles.imageContainer}
         >
 
-          <Text
+          <Image
+
+            source={{
+              uri:
+                item.image,
+            }}
+
+            style={styles.image}
+
+          />
+
+          {/* DISCOUNT */}
+
+          <View
+            style={styles.discountBadge}
+          >
+
+            <Image
+              source={require("../assets/icons/home.png")}
+              style={{
+                width: 12,
+                height: 12,
+                tintColor: "white",
+                resizeMode: "contain",
+                marginRight: 4,
+              }}
+            />
+
+            <Text
+              style={
+                styles.discountText
+              }
+            >
+
+              40% OFF
+
+            </Text>
+
+          </View>
+
+          {/* WISHLIST */}
+
+          <TouchableOpacity
             style={
-              styles.categoryText
+              styles.wishlistBtn
             }
           >
 
-            {item.category}
+            <Image
+              source={require("../assets/icons/empty-wishlist.png")}
+              style={{
+                width: 18,
+                height: 18,
+                tintColor: "#111",
+                resizeMode: "contain",
+              }}
+            />
+
+          </TouchableOpacity>
+
+        </View>
+
+        {/* DETAILS */}
+
+        <View
+          style={styles.details}
+        >
+
+          {/* NAME */}
+
+          <Text
+
+            numberOfLines={2}
+
+            style={styles.name}
+
+          >
+
+            {item.name}
 
           </Text>
+
+          {/* RATING */}
+
+          <View
+            style={styles.ratingRow}
+          >
+
+            <Image
+              source={require("../assets/icons/star.png")}
+              style={{
+                width: 14,
+                height: 14,
+                tintColor: "#ffb300",
+                resizeMode: "contain",
+              }}
+            />
+
+            <Text
+              style={
+                styles.ratingText
+              }
+            >
+
+              4.5
+
+            </Text>
+
+            <Text
+              style={
+                styles.reviewText
+              }
+            >
+
+              (2.1k)
+
+            </Text>
+
+          </View>
+
+          {/* PRICE */}
+
+          <View
+            style={styles.priceRow}
+          >
+
+            <Text
+              style={styles.price}
+            >
+
+              ₹ {item.price}
+
+            </Text>
+
+            <Text
+              style={
+                styles.oldPrice
+              }
+            >
+
+              ₹ {item.price + 800}
+
+            </Text>
+
+          </View>
+
+          {/* CATEGORY */}
+
+          <View
+            style={
+              styles.categoryBox
+            }
+          >
+
+            <Text
+              style={
+                styles.categoryText
+              }
+            >
+
+              {item.category}
+
+            </Text>
+
+          </View>
+
+          {/* ADD TO CART */}
+
+          <TouchableOpacity
+            style={
+              styles.cartButton
+            }
+          >
+
+            <Image
+              source={require("../assets/icons/cart.png")}
+              style={{
+                width: 18,
+                height: 18,
+                tintColor: "white",
+                resizeMode: "contain",
+              }}
+            />
+
+            <Text
+              style={
+                styles.cartText
+              }
+            >
+
+              Add
+
+            </Text>
+
+          </TouchableOpacity>
 
         </View>
 
@@ -191,25 +337,45 @@ export default function CategoryProductsScreen({
         style={styles.header}
       >
 
-        <Text
-          style={styles.heading}
+        <View>
+
+          <Text
+            style={styles.heading}
+          >
+
+            {category}
+
+          </Text>
+
+          <Text
+            style={styles.subHeading}
+          >
+
+            Discover premium products
+
+          </Text>
+
+        </View>
+
+        <View
+          style={styles.productCount}
         >
 
-          {category}
+          <Text
+            style={
+              styles.productCountText
+            }
+          >
 
-        </Text>
+            {
 
-        <Text
-          style={styles.subHeading}
-        >
+              products.length
 
-          {
+            } Items
 
-            products.length
+          </Text>
 
-          } Products Found
-
-        </Text>
+        </View>
 
       </View>
 
@@ -225,6 +391,16 @@ export default function CategoryProductsScreen({
               styles.emptyContainer
             }
           >
+
+            <Image
+              source={require("../assets/icons/no-results.png")}
+              style={{
+                width: 100,
+                height: 100,
+                tintColor: "#ccc",
+                resizeMode: "contain",
+              }}
+            />
 
             <Text
               style={
@@ -262,7 +438,7 @@ export default function CategoryProductsScreen({
             }}
 
             contentContainerStyle={{
-              paddingBottom: 100,
+              paddingBottom: 120,
             }}
 
             renderItem={
@@ -289,21 +465,30 @@ const styles =
       flex: 1,
 
       backgroundColor:
-        "#f5f7fb",
+        "#f4f6fb",
 
-      padding: 15,
+      paddingHorizontal: 15,
+
+      paddingTop: 10,
 
     },
 
     header: {
 
-      marginBottom: 20,
+      flexDirection: "row",
+
+      justifyContent:
+        "space-between",
+
+      alignItems: "center",
+
+      marginBottom: 22,
 
     },
 
     heading: {
 
-      fontSize: 30,
+      fontSize: 34,
 
       fontWeight: "bold",
 
@@ -315,9 +500,32 @@ const styles =
 
       color: "gray",
 
-      marginTop: 5,
+      marginTop: 6,
 
-      fontSize: 15,
+      fontSize: 14,
+
+    },
+
+    productCount: {
+
+      backgroundColor:
+        "#2874f0",
+
+      paddingHorizontal: 16,
+
+      paddingVertical: 10,
+
+      borderRadius: 30,
+
+    },
+
+    productCountText: {
+
+      color: "white",
+
+      fontWeight: "bold",
+
+      fontSize: 13,
 
     },
 
@@ -325,16 +533,32 @@ const styles =
 
       width: "48%",
 
-      backgroundColor:
-        "white",
+      backgroundColor: "#fff",
 
-      borderRadius: 20,
+      borderRadius: 28,
 
-      padding: 12,
+      marginBottom: 22,
 
-      marginBottom: 18,
+      overflow: "hidden",
 
-      elevation: 3,
+      elevation: 6,
+
+      shadowColor: "#000",
+
+      shadowOffset: {
+        width: 0,
+        height: 5,
+      },
+
+      shadowOpacity: 0.08,
+
+      shadowRadius: 10,
+
+    },
+
+    imageContainer: {
+
+      position: "relative",
 
     },
 
@@ -342,11 +566,74 @@ const styles =
 
       width: "100%",
 
-      height: 160,
-
-      borderRadius: 15,
+      height: 190,
 
       resizeMode: "cover",
+
+    },
+
+    discountBadge: {
+
+      position: "absolute",
+
+      top: 12,
+
+      left: 12,
+
+      backgroundColor:
+        "#ff3b30",
+
+      flexDirection: "row",
+
+      alignItems: "center",
+
+      paddingHorizontal: 10,
+
+      paddingVertical: 6,
+
+      borderRadius: 20,
+
+    },
+
+    discountText: {
+
+      color: "white",
+
+      fontWeight: "bold",
+
+      fontSize: 11,
+
+    },
+
+    wishlistBtn: {
+
+      position: "absolute",
+
+      top: 12,
+
+      right: 12,
+
+      backgroundColor:
+        "white",
+
+      width: 36,
+
+      height: 36,
+
+      borderRadius: 18,
+
+      justifyContent:
+        "center",
+
+      alignItems: "center",
+
+      elevation: 4,
+
+    },
+
+    details: {
+
+      padding: 14,
 
     },
 
@@ -354,25 +641,78 @@ const styles =
 
       fontSize: 15,
 
-      fontWeight: "600",
+      fontWeight: "700",
 
       color: "#111",
 
+      lineHeight: 22,
+
+      minHeight: 48,
+
+    },
+
+    ratingRow: {
+
+      flexDirection: "row",
+
+      alignItems: "center",
+
       marginTop: 10,
 
-      minHeight: 45,
+    },
+
+    ratingText: {
+
+      marginLeft: 5,
+
+      fontWeight: "bold",
+
+      color: "#111",
+
+      fontSize: 13,
+
+    },
+
+    reviewText: {
+
+      marginLeft: 5,
+
+      color: "gray",
+
+      fontSize: 12,
+
+    },
+
+    priceRow: {
+
+      flexDirection: "row",
+
+      alignItems: "center",
+
+      marginTop: 12,
 
     },
 
     price: {
 
-      fontSize: 18,
+      fontSize: 21,
 
       fontWeight: "bold",
 
       color: "#2874f0",
 
-      marginTop: 8,
+    },
+
+    oldPrice: {
+
+      marginLeft: 8,
+
+      color: "gray",
+
+      fontSize: 13,
+
+      textDecorationLine:
+        "line-through",
 
     },
 
@@ -384,13 +724,13 @@ const styles =
       alignSelf:
         "flex-start",
 
-      paddingHorizontal: 10,
+      marginTop: 14,
 
-      paddingVertical: 5,
+      paddingHorizontal: 14,
 
-      borderRadius: 20,
+      paddingVertical: 7,
 
-      marginTop: 10,
+      borderRadius: 30,
 
     },
 
@@ -398,9 +738,43 @@ const styles =
 
       color: "#2874f0",
 
+      fontWeight: "700",
+
+      fontSize: 11,
+
+      letterSpacing: 0.5,
+
+    },
+
+    cartButton: {
+
+      marginTop: 16,
+
+      backgroundColor:
+        "#2874f0",
+
+      borderRadius: 16,
+
+      paddingVertical: 11,
+
+      flexDirection: "row",
+
+      justifyContent:
+        "center",
+
+      alignItems: "center",
+
+    },
+
+    cartText: {
+
+      color: "white",
+
       fontWeight: "bold",
 
-      fontSize: 12,
+      marginLeft: 8,
+
+      fontSize: 14,
 
     },
 
@@ -414,17 +788,19 @@ const styles =
       alignItems:
         "center",
 
-      marginTop: 100,
+      marginTop: 120,
 
     },
 
     emptyText: {
 
-      fontSize: 20,
+      fontSize: 22,
 
       color: "gray",
 
       fontWeight: "bold",
+
+      marginTop: 18,
 
     },
 

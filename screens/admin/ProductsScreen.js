@@ -21,7 +21,9 @@ import {
 
 import axios from "axios";
 
-import { useAuth } from "../../src/context/AuthContext";
+import {
+  useAuth,
+} from "../../src/context/AuthContext";
 
 export default function ProductsScreen() {
 
@@ -36,8 +38,20 @@ export default function ProductsScreen() {
   const [brand, setBrand] =
     useState("");
 
-  const [category, setCategory] =
-    useState("");
+  const [
+    categories,
+    setCategories,
+  ] = useState([]);
+
+  const [
+    selectedCategory,
+    setSelectedCategory,
+  ] = useState("");
+
+  const [
+    categoryImage,
+    setCategoryImage,
+  ] = useState("");
 
   const [price, setPrice] =
     useState("");
@@ -50,6 +64,7 @@ export default function ProductsScreen() {
 
   const [description, setDescription] =
     useState("");
+
   const [
     originalPrice,
     setOriginalPrice,
@@ -58,7 +73,7 @@ export default function ProductsScreen() {
   const [
     discountPercent,
     setDiscountPercent,
-  ] = useState("");
+  ] = useState(0);
 
   const [
     rating,
@@ -79,12 +94,17 @@ export default function ProductsScreen() {
     offers,
     setOffers,
   ] = useState("");
-  const [editingId, setEditingId] =
-    useState(null);
+
+  const [
+    editingId,
+    setEditingId,
+  ] = useState(null);
 
   useEffect(() => {
 
     fetchProducts();
+
+    fetchCategories();
 
   }, []);
 
@@ -99,151 +119,251 @@ export default function ProductsScreen() {
 
   };
 
-  const fetchProducts = async () => {
+  const fetchProducts =
+    async () => {
 
-    try {
+      try {
 
-      const response =
-        await axios.get(
-          "https://e-commerce-mern-stack-0okr.onrender.com/api/products"
+        const response =
+          await axios.get(
+
+            "https://e-commerce-mern-stack-0okr.onrender.com/api/products"
+
+          );
+
+        setProducts(
+          response.data
         );
 
-      setProducts(response.data);
+      } catch (error) {
 
-    } catch (error) {
+        console.log(error);
 
-      console.log(error);
+      }
 
-    }
+    };
+  const fetchCategories =
+    async () => {
 
-  };
+      try {
 
-  const addProduct = async () => {
+        const response =
+          await axios.get(
 
-    try {
+            "https://e-commerce-mern-stack-0okr.onrender.com/api/categories"
 
-      const productData = {
+          );
 
-        name,
-
-        brand,
-
-        category,
-
-        price,
-
-        stock,
-
-        image,
-
-        description,
-
-        originalPrice,
-
-        discountPercent,
-
-        rating,
-
-        numReviews,
-
-        deliveryDays,
-
-        offers:
-          offers.split(","),
-
-        inStock:
-          stock > 0,
-
-      };
-
-      if (editingId) {
-
-        await axios.put(
-
-          `https://e-commerce-mern-stack-0okr.onrender.com/api/products/${editingId}`,
-
-          productData,
-
-          config
-
+        setCategories(
+          response.data
         );
 
-        Alert.alert(
-          "Updated",
-          "Product Updated"
+      } catch (error) {
+
+        console.log(error);
+
+      }
+
+    };
+  useEffect(() => {
+
+    if (
+
+      originalPrice &&
+      price
+
+    ) {
+
+      const original =
+        parseFloat(
+          originalPrice
+        );
+
+      const selling =
+        parseFloat(price);
+
+      if (
+        original > selling
+      ) {
+
+        const discount =
+
+          Math.round(
+
+            (
+              (
+                original -
+                selling
+              ) /
+
+              original
+            ) * 100
+          );
+
+        setDiscountPercent(
+          discount
         );
 
       } else {
 
-        await axios.post(
+        setDiscountPercent(0);
 
-          "https://e-commerce-mern-stack-0okr.onrender.com/api/products",
+      }
 
-          productData,
+    }
+
+  }, [
+
+    originalPrice,
+
+    price,
+
+  ]);
+  const addProduct =
+    async () => {
+
+      try {
+
+        const productData = {
+
+          name,
+
+          brand,
+
+          category:
+            selectedCategory,
+
+          categoryImage,
+
+          price,
+
+          stock,
+
+          image,
+
+          description,
+
+          originalPrice,
+
+          discountPercent,
+
+          rating,
+
+          numReviews,
+
+          deliveryDays,
+
+          offers:
+            offers.split(","),
+
+          inStock:
+            stock > 0,
+
+        };
+
+        if (editingId) {
+
+          await axios.put(
+
+            `https://e-commerce-mern-stack-0okr.onrender.com/api/products/${editingId}`,
+
+            productData,
+
+            config
+
+          );
+
+          Alert.alert(
+            "Updated",
+            "Product Updated"
+          );
+
+        } else {
+
+          await axios.post(
+
+            "https://e-commerce-mern-stack-0okr.onrender.com/api/products",
+
+            productData,
+
+            config
+
+          );
+
+          Alert.alert(
+            "Success",
+            "Product Added"
+          );
+
+        }
+
+        fetchProducts();
+
+        setName("");
+
+        setBrand("");
+
+        setSelectedCategory("");
+
+        setCategoryImage("");
+
+        setPrice("");
+
+        setStock("");
+
+        setImage("");
+
+        setDescription("");
+
+        setOriginalPrice("");
+
+        setDiscountPercent("");
+
+        setRating("");
+
+        setNumReviews("");
+
+        setDeliveryDays("");
+
+        setOffers("");
+
+        setEditingId(null);
+
+      } catch (error) {
+
+        console.log(error);
+
+      }
+
+    };
+
+  const deleteProduct =
+    async (id) => {
+
+      try {
+
+        await axios.delete(
+
+          `https://e-commerce-mern-stack-0okr.onrender.com/api/products/${id}`,
 
           config
 
         );
 
         Alert.alert(
-          "Success",
-          "Product Added"
+          "Deleted",
+          "Product Deleted"
         );
+
+        fetchProducts();
+
+      } catch (error) {
+
+        console.log(error);
 
       }
 
-      fetchProducts();
-
-      setName("");
-
-      setBrand("");
-
-      setCategory("");
-
-      setPrice("");
-
-      setStock("");
-
-      setImage("");
-
-      setDescription("");
-
-      setEditingId(null);
-
-    } catch (error) {
-
-      console.log(error);
-
-    }
-
-  };
-
-  const deleteProduct = async (id) => {
-
-    try {
-
-      await axios.delete(
-
-        `https://e-commerce-mern-stack-0okr.onrender.com/api/products/${id}`,
-
-        config
-
-      );
-
-      Alert.alert(
-        "Deleted",
-        "Product Deleted"
-      );
-
-      fetchProducts();
-
-    } catch (error) {
-
-      console.log(error);
-
-    }
-
-  };
+    };
 
   return (
 
@@ -251,12 +371,18 @@ export default function ProductsScreen() {
       style={styles.container}
     >
 
-      <ScrollView>
+      <ScrollView
+        showsVerticalScrollIndicator={
+          false
+        }
+      >
 
         <Text style={styles.heading}>
+
           {editingId
             ? "Edit Product"
             : "Add Product"}
+
         </Text>
 
         <TextInput
@@ -273,18 +399,83 @@ export default function ProductsScreen() {
           onChangeText={setBrand}
         />
 
-        <TextInput
-          placeholder="Category"
-          style={styles.input}
-          value={category}
-          onChangeText={setCategory}
-        />
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          style={{ marginBottom: 15 }}
+        >
+
+          {categories.map(
+            (item) => (
+
+              <TouchableOpacity
+
+                key={item._id}
+
+                style={{
+
+                  paddingVertical: 10,
+
+                  paddingHorizontal: 18,
+
+                  backgroundColor:
+
+                    selectedCategory ===
+                      item._id
+
+                      ? "#2874f0"
+
+                      : "#f1f1f1",
+
+                  borderRadius: 30,
+
+                  marginRight: 10,
+
+                }}
+
+                onPress={() => {
+                  setSelectedCategory(item._id);
+                  setCategoryImage(item.image); // Auto-fill category image
+                }}
+
+              >
+
+                <Text
+                  style={{
+
+                    color:
+
+                      selectedCategory ===
+                        item._id
+
+                        ? "white"
+
+                        : "#111",
+
+                    fontWeight: "bold",
+
+                  }}
+                >
+
+                  {item.name}
+
+                </Text>
+
+              </TouchableOpacity>
+
+            )
+          )}
+
+        </ScrollView>
+
+
 
         <TextInput
           placeholder="Price"
           style={styles.input}
           value={price}
           onChangeText={setPrice}
+          keyboardType="numeric"
         />
 
         <TextInput
@@ -292,14 +483,16 @@ export default function ProductsScreen() {
           style={styles.input}
           value={stock}
           onChangeText={setStock}
+          keyboardType="numeric"
         />
 
         <TextInput
-          placeholder="Image URL"
+          placeholder="Product Image URL"
           style={styles.input}
           value={image}
           onChangeText={setImage}
         />
+
         <TextInput
           placeholder="Original Price"
           style={styles.input}
@@ -310,12 +503,18 @@ export default function ProductsScreen() {
         />
 
         <TextInput
+
           placeholder="Discount %"
+
           style={styles.input}
-          value={discountPercent}
-          onChangeText={
-            setDiscountPercent
-          }
+
+
+          value={String(
+            discountPercent
+          )}
+
+          editable={false}
+
         />
 
         <TextInput
@@ -353,6 +552,7 @@ export default function ProductsScreen() {
             setOffers
           }
         />
+
         <TextInput
           placeholder="Description"
           style={[
@@ -363,7 +563,9 @@ export default function ProductsScreen() {
           ]}
           multiline
           value={description}
-          onChangeText={setDescription}
+          onChangeText={
+            setDescription
+          }
         />
 
         <TouchableOpacity
@@ -392,7 +594,9 @@ export default function ProductsScreen() {
 
           data={products}
 
-          keyExtractor={(item) => item._id}
+          keyExtractor={(item) =>
+            item._id
+          }
 
           scrollEnabled={false}
 
@@ -401,11 +605,20 @@ export default function ProductsScreen() {
             <View style={styles.card}>
 
               <Image
-                source={{ uri: item.image }}
+
+                source={{
+                  uri: item.image,
+                }}
+
                 style={styles.image}
+
               />
 
-              <View style={{ flex: 1 }}>
+              <View
+                style={{
+                  flex: 1,
+                }}
+              >
 
                 <Text style={styles.name}>
                   {item.name}
@@ -419,6 +632,8 @@ export default function ProductsScreen() {
                   Stock: {item.stock}
                 </Text>
 
+               <Text>{item.category?.name || "No Category"}</Text>
+
               </View>
 
               <TouchableOpacity
@@ -427,60 +642,95 @@ export default function ProductsScreen() {
 
                 onPress={() => {
 
-                  setEditingId(item._id);
+                  setEditingId(
+                    item._id
+                  );
 
-                  setName(item.name);
+                  setName(
+                    item.name
+                  );
 
-                  setBrand(item.brand);
+                  setBrand(
+                    item.brand
+                  );
 
-                  setCategory(item.category);
+                  setSelectedCategory(item.category?._id || item.category);
+                  setCategoryImage(item.categoryImage || "");
+
+                  setCategoryImage(
+
+                    item.categoryImage || ""
+
+                  );
 
                   setPrice(
-                    String(item.price)
+                    String(
+                      item.price
+                    )
                   );
 
                   setStock(
-                    String(item.stock)
+                    String(
+                      item.stock
+                    )
                   );
 
-                  setImage(item.image);
+                  setImage(
+                    item.image
+                  );
 
                   setDescription(
+
                     item.description
+
                   );
+
                   setOriginalPrice(
+
                     String(
                       item.originalPrice || ""
                     )
+
                   );
 
                   setDiscountPercent(
+
                     String(
                       item.discountPercent || ""
                     )
+
                   );
 
                   setRating(
+
                     String(
                       item.rating || ""
                     )
+
                   );
 
                   setNumReviews(
+
                     String(
                       item.numReviews || ""
                     )
+
                   );
 
                   setDeliveryDays(
+
                     item.deliveryDays || ""
+
                   );
 
                   setOffers(
+
                     item.offers
                       ? item.offers.join(",")
                       : ""
+
                   );
+
                 }}
 
               >
@@ -496,7 +746,9 @@ export default function ProductsScreen() {
                 style={styles.deleteButton}
 
                 onPress={() =>
-                  deleteProduct(item._id)
+                  deleteProduct(
+                    item._id
+                  )
                 }
 
               >
@@ -521,122 +773,143 @@ export default function ProductsScreen() {
 
 }
 
-const styles = StyleSheet.create({
+const styles =
+  StyleSheet.create({
 
-  container: {
+    container: {
 
-    flex: 1,
+      flex: 1,
 
-    backgroundColor: "#fff",
+      backgroundColor:
+        "#f8f9fd",
 
-    padding: 15,
+      padding: 15,
 
-  },
+    },
 
-  heading: {
+    heading: {
 
-    fontSize: 28,
+      fontSize: 30,
 
-    fontWeight: "bold",
+      fontWeight: "bold",
 
-    marginBottom: 15,
+      marginBottom: 18,
 
-    marginTop: 10,
+      marginTop: 10,
 
-  },
+      color: "#111",
 
-  input: {
+    },
 
-    backgroundColor: "#f5f5f5",
+    input: {
 
-    padding: 15,
+      backgroundColor:
+        "white",
 
-    borderRadius: 10,
+      padding: 16,
 
-    marginBottom: 12,
+      borderRadius: 16,
 
-  },
+      marginBottom: 14,
 
-  addButton: {
+      fontSize: 16,
 
-    backgroundColor: "#e94560",
+      elevation: 2,
 
-    padding: 15,
+    },
 
-    borderRadius: 12,
+    addButton: {
 
-    alignItems: "center",
+      backgroundColor:
+        "#2874f0",
 
-    marginBottom: 25,
+      padding: 18,
 
-  },
+      borderRadius: 16,
 
-  buttonText: {
+      alignItems: "center",
 
-    color: "white",
+      marginBottom: 25,
 
-    fontWeight: "bold",
+      elevation: 3,
 
-    fontSize: 16,
+    },
 
-  },
+    buttonText: {
 
-  card: {
+      color: "white",
 
-    flexDirection: "row",
+      fontWeight: "bold",
 
-    alignItems: "center",
+      fontSize: 16,
 
-    backgroundColor: "#f5f5f5",
+    },
 
-    padding: 12,
+    card: {
 
-    borderRadius: 12,
+      flexDirection: "row",
 
-    marginBottom: 12,
+      alignItems: "center",
 
-  },
+      backgroundColor:
+        "white",
 
-  image: {
+      padding: 14,
 
-    width: 70,
+      borderRadius: 18,
 
-    height: 70,
+      marginBottom: 14,
 
-    borderRadius: 10,
+      elevation: 3,
 
-    marginRight: 10,
+    },
 
-  },
+    image: {
 
-  name: {
+      width: 75,
 
-    fontSize: 16,
+      height: 75,
 
-    fontWeight: "bold",
+      borderRadius: 14,
 
-  },
+      marginRight: 12,
 
-  editButton: {
+    },
 
-    backgroundColor: "orange",
+    name: {
 
-    padding: 10,
+      fontSize: 17,
 
-    borderRadius: 8,
+      fontWeight: "bold",
 
-    marginRight: 8,
+      color: "#111",
 
-  },
+      marginBottom: 4,
 
-  deleteButton: {
+    },
 
-    backgroundColor: "red",
+    editButton: {
 
-    padding: 10,
+      backgroundColor:
+        "#ff9800",
 
-    borderRadius: 8,
+      padding: 10,
 
-  },
+      borderRadius: 10,
 
-});
+      marginRight: 8,
+
+    },
+
+    deleteButton: {
+
+      backgroundColor:
+        "#f44336",
+
+      padding: 10,
+
+      borderRadius: 10,
+
+    },
+
+  });

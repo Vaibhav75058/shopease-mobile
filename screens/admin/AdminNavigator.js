@@ -15,7 +15,8 @@ import ProductsScreen from "./ProductsScreen";
 import OrdersScreen from "./OrdersScreen";
 
 import UsersScreen from "./UsersScreen";
-
+import CategoriesScreen
+  from "./CategoriesScreen";
 const Tab =
   createMaterialTopTabNavigator();
 
@@ -70,7 +71,15 @@ export default function AdminNavigator() {
           name="Products"
           component={ProductsScreen}
         />
+        <Tab.Screen
 
+          name="Categories"
+
+          component={
+            CategoriesScreen
+          }
+
+        />
         <Tab.Screen
           name="Orders"
           component={OrdersScreen}

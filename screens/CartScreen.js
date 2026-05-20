@@ -59,7 +59,7 @@ export default function CartScreen({
 
         acc +
         (item.price + 500) *
-          item.qty,
+        item.qty,
 
       0
 
@@ -94,14 +94,14 @@ export default function CartScreen({
           }
         >
 
-          <Ionicons
-
-            name="cart-outline"
-
-            size={90}
-
-            color="#2874f0"
-
+          <Image
+            source={require("../assets/icons/empty-cart.png")}
+            style={{
+              width: 90,
+              height: 90,
+              tintColor: "#2874f0",
+              resizeMode: "contain",
+            }}
           />
 
         </View>
@@ -312,14 +312,14 @@ export default function CartScreen({
 
                 >
 
-                  <Ionicons
-
-                    name="remove"
-
-                    size={18}
-
-                    color="#111"
-
+                  <Image
+                    source={require("../assets/icons/minus-sign.png")}
+                    style={{
+                      width: 18,
+                      height: 18,
+                      tintColor: "#111",
+                      resizeMode: "contain",
+                    }}
                   />
 
                 </TouchableOpacity>
@@ -352,14 +352,14 @@ export default function CartScreen({
 
                 >
 
-                  <Ionicons
-
-                    name="add"
-
-                    size={18}
-
-                    color="#111"
-
+                  <Image
+                    source={require("../assets/icons/plus.png")}
+                    style={{
+                      width: 18,
+                      height: 18,
+                      tintColor: "#111",
+                      resizeMode: "contain",
+                    }}
                   />
 
                 </TouchableOpacity>
@@ -380,14 +380,14 @@ export default function CartScreen({
 
                 >
 
-                  <Ionicons
-
-                    name="trash-outline"
-
-                    size={20}
-
-                    color="#e94560"
-
+                  <Image
+                    source={require("../assets/icons/delete.png")}
+                    style={{
+                      width: 20,
+                      height: 20,
+                      tintColor: "#e94560",
+                      resizeMode: "contain",
+                    }}
                   />
 
                 </TouchableOpacity>

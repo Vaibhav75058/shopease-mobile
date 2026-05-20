@@ -12,7 +12,6 @@ import {
   Image,
   ScrollView,
   TouchableOpacity,
-  Alert,
 } from "react-native";
 
 import {
@@ -33,7 +32,6 @@ import {
 export default function ProductDetailsScreen({
 
   route,
-
   navigation,
 
 }) {
@@ -146,10 +144,13 @@ export default function ProductDetailsScreen({
 
           >
 
-            <Ionicons
-              name="arrow-back"
-              size={24}
-              color="#111"
+            <Image
+              source={require("../assets/icons/back-arrow.png")}
+              style={{
+                width: 24,
+                height: 24,
+                resizeMode: "contain",
+              }}
             />
 
           </TouchableOpacity>
@@ -168,10 +169,13 @@ export default function ProductDetailsScreen({
 
           >
 
-            <Ionicons
-              name="heart-outline"
-              size={24}
-              color="#111"
+            <Image
+              source={require("../assets/icons/wish-list.png")}
+              style={{
+                width: 24,
+                height: 24,
+                resizeMode: "contain",
+              }}
             />
 
           </TouchableOpacity>
@@ -200,9 +204,8 @@ export default function ProductDetailsScreen({
               }
             >
 
-              {
-                product.category
-              }
+              
+              {product.category?.name || "Uncategorized"}
 
             </Text>
 
@@ -232,15 +235,29 @@ export default function ProductDetailsScreen({
               }
             >
 
-              <Text
-                style={
-                  styles.rating
-                }
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                }}
               >
+                <Text
+                  style={styles.rating}
+                >
+                  {product.rating}
+                </Text>
 
-                {product.rating} ★
-
-              </Text>
+                <Image
+                  source={require("../assets/icons/star.png")}
+                  style={{
+                    width: 14,
+                    height: 14,
+                    // tintColor: "white",
+                    resizeMode: "contain",
+                    marginLeft: 4,
+                  }}
+                />
+              </View>
 
             </View>
 
@@ -250,7 +267,7 @@ export default function ProductDetailsScreen({
               }
             >
 
-              {product.numReviews}
+              {product.numReviews + " "}
               Ratings & Reviews
 
             </Text>
@@ -378,10 +395,14 @@ export default function ProductDetailsScreen({
             }
           >
 
-            <Ionicons
-              name="location-outline"
-              size={26}
-              color="#2874f0"
+            <Image
+              source={require("../assets/icons/empty-location.png")}
+              style={{
+                width: 26,
+                height: 26,
+                tintColor: "#2874f0",
+                resizeMode: "contain",
+              }}
             />
 
             <View
@@ -398,7 +419,7 @@ export default function ProductDetailsScreen({
               >
 
                 Delivery in
-                {product.deliveryDays}
+                {" " + product.deliveryDays}
 
               </Text>
 
@@ -442,10 +463,14 @@ export default function ProductDetailsScreen({
 
         >
 
-          <Ionicons
-            name="cart"
-            size={22}
-            color="white"
+          <Image
+            source={require("../assets/icons/cart.png")}
+            style={{
+              width: 22,
+              height: 22,
+              tintColor: "white",
+              resizeMode: "contain",
+            }}
           />
 
           <Text
@@ -468,11 +493,21 @@ export default function ProductDetailsScreen({
             styles.buyButton
           }
 
-          onPress={() =>
+          onPress={() => {
+
+            addToCart({
+
+              ...product,
+
+              qty: 1,
+
+            });
+
             navigation.navigate(
               "Checkout"
-            )
-          }
+            );
+
+          }}
 
         >
 
@@ -593,7 +628,7 @@ const styles =
 
       width: "100%",
 
-      height: 320,
+      height: 350,
 
       resizeMode:
         "contain",
@@ -663,7 +698,7 @@ const styles =
     categoryBox: {
 
       backgroundColor:
-        "#eef4ff",
+        "#c3c8d2",
 
       alignSelf:
         "flex-start",
@@ -787,31 +822,6 @@ const styles =
       fontWeight: "bold",
 
       fontSize: 16,
-
-    },
-
-    offerBox: {
-
-      backgroundColor:
-        "white",
-
-      borderRadius: 20,
-
-      padding: 18,
-
-      marginTop: 22,
-
-      elevation: 2,
-
-    },
-
-    offerTitle: {
-
-      fontSize: 18,
-
-      fontWeight: "bold",
-
-      marginBottom: 10,
 
     },
 

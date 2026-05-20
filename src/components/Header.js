@@ -7,9 +7,6 @@ import {
   Image,
 } from "react-native";
 
-import Ionicons
-  from "@expo/vector-icons/Ionicons";
-
 import {
   useNavigation,
 } from "@react-navigation/native";
@@ -41,26 +38,29 @@ export default function Header() {
 
         <TouchableOpacity
 
-  style={styles.iconBox}
+          style={styles.iconBox}
 
-  onPress={() => {
+          onPress={() => {
 
-    console.log(
-      "Notification Clicked"
-    );
+            console.log(
+              "Notification Clicked"
+            );
 
-    navigation.push(
-      "Notifications"
-    );
+            navigation.push(
+              "Notifications"
+            );
 
-  }}
+          }}
 
->
+        >
 
-          <Ionicons
-            name="notifications-outline"
-            size={24}
-            color="#111"
+          <Image
+            source={require("../../assets/icons/notification-bell.png")}
+            style={{
+              width: 24,
+              height: 24,
+              resizeMode: "contain",
+            }}
           />
 
         </TouchableOpacity>
@@ -79,10 +79,13 @@ export default function Header() {
 
         >
 
-          <Ionicons
-            name="heart-outline"
-            size={24}
-            color="#e94560"
+          <Image
+            source={require("../../assets/icons/heart.png")}
+            style={{
+              width: 24,
+              height: 24,
+              resizeMode: "contain",
+            }}
           />
 
         </TouchableOpacity>

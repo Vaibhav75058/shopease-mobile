@@ -57,16 +57,15 @@ export default function WishlistScreen({
             }
           >
 
-            <Ionicons
-
-              name="heart-outline"
-
-              size={90}
-
-              color="#ccc"
-
-            />
-
+            <Image
+  source={require("../assets/icons/empty-wishlist.png")}
+  style={{
+    width: 90,
+    height: 90,
+    tintColor: "#ccc",
+    resizeMode: "contain",
+  }}
+/>
             <Text
               style={
                 styles.emptyText
@@ -189,16 +188,15 @@ export default function WishlistScreen({
 
                 >
 
-                  <Ionicons
-
-                    name="trash-outline"
-
-                    size={22}
-
-                    color="#e94560"
-
-                  />
-
+                 <Image
+  source={require("../assets/icons/delete.png")}
+  style={{
+    width: 22,
+    height: 22,
+    tintColor: "#e94560",
+    resizeMode: "contain",
+  }}
+/>
                 </TouchableOpacity>
 
               </TouchableOpacity>

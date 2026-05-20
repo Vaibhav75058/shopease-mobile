@@ -19,8 +19,7 @@ import {
 
 import axios from "axios";
 
-import Ionicons
-  from "@expo/vector-icons/Ionicons";
+
 
 import { useAuth }
   from "../../src/context/AuthContext";
@@ -81,7 +80,7 @@ export default function OrdersScreen() {
 
       await axios.put(
 
-       `https://e-commerce-mern-stack-0okr.onrender.com/api/orders/${id}/status`,
+        `https://e-commerce-mern-stack-0okr.onrender.com/api/orders/${id}/status`,
 
         {
           status,
@@ -131,30 +130,7 @@ export default function OrdersScreen() {
 
   };
 
-  const getStatusIcon = (
-    status
-  ) => {
-
-    switch (status) {
-
-      case "Processing":
-        return "time-outline";
-
-      case "Shipped":
-        return "car-outline";
-
-      case "Out For Delivery":
-        return "bicycle-outline";
-
-      case "Delivered":
-        return "checkmark-circle";
-
-      default:
-        return "cube-outline";
-
-    }
-
-  };
+  
 
   return (
 
@@ -204,18 +180,32 @@ export default function OrdersScreen() {
               style={styles.statusRow}
             >
 
-              <Ionicons
+              <Image
+                source={
+                  item.status === "Processing"
 
-                name={getStatusIcon(
-                  item.status
-                )}
+                    ? require("../../assets/icons/processing.png")
 
-                size={20}
+                    : item.status === "Shipped"
 
-                color={getStatusColor(
-                  item.status
-                )}
+                      ? require("../../assets/icons/shipped.png")
 
+                      : item.status === "Out For Delivery"
+
+                        ? require("../../assets/icons/delivery-bike.png")
+
+                        : item.status === "Delivered"
+
+                          ? require("../../assets/icons/delivered.png")
+
+                          : require("../../assets/icons/package.png")
+                }
+                style={{
+                  width: 20,
+                  height: 20,
+                  tintColor: getStatusColor(item.status),
+                  resizeMode: "contain",
+                }}
               />
 
               <Text

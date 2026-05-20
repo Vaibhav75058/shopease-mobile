@@ -196,11 +196,33 @@ export default function ProfileScreen({
 
               <View style={styles.left}>
 
-                <Ionicons
-                  name={item.icon}
-                  size={24}
-                  color="#2874f0"
-                />
+                <Image
+  source={
+    item.title === "My Orders"
+
+      ? require("../assets/icons/orders.png")
+
+      : item.title === "Wishlist"
+
+      ? require("../assets/icons/empty-wishlist.png")
+
+      : item.title === "Saved Address"
+
+      ? require("../assets/icons/empty-location.png")
+
+      : item.title === "Help Center"
+
+      ? require("../assets/icons/help-center.png")
+
+      : require("../assets/icons/categories.png")
+  }
+  style={{
+    width: 24,
+    height: 24,
+    tintColor: "#2874f0",
+    resizeMode: "contain",
+  }}
+/>
 
                 <Text style={styles.menuText}>
                   {item.title}
@@ -208,11 +230,15 @@ export default function ProfileScreen({
 
               </View>
 
-              <Ionicons
-                name="chevron-forward"
-                size={22}
-                color="gray"
-              />
+              <Image
+  source={require("../assets/icons/right-arrow.png")}
+  style={{
+    width: 22,
+    height: 22,
+    tintColor: "gray",
+    resizeMode: "contain",
+  }}
+/>
 
             </TouchableOpacity>
 
@@ -230,11 +256,15 @@ export default function ProfileScreen({
 
         >
 
-          <Ionicons
-            name="log-out-outline"
-            size={24}
-            color="white"
-          />
+         <Image
+  source={require("../assets/icons/logout.png")}
+  style={{
+    width: 24,
+    height: 24,
+    tintColor: "white",
+    resizeMode: "contain",
+  }}
+/>
 
           <Text style={styles.logoutText}>
             Logout

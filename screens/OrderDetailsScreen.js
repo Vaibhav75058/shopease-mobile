@@ -134,14 +134,14 @@ export default function OrderDetailsScreen({
             style={styles.row}
           >
 
-            <Ionicons
-
-              name="home-outline"
-
-              size={24}
-
-              color="#111"
-
+            <Image
+              source={require("../assets/icons/home.png")}
+              style={{
+                width: 24,
+                height: 24,
+                tintColor: "#111",
+                resizeMode: "contain",
+              }}
             />
 
             <Text
@@ -185,14 +185,14 @@ export default function OrderDetailsScreen({
             style={styles.row}
           >
 
-            <Ionicons
-
-              name="person-outline"
-
-              size={24}
-
-              color="#111"
-
+            <Image
+              source={require("../assets/icons/person.png")}
+              style={{
+                width: 24,
+                height: 24,
+                tintColor: "#111",
+                resizeMode: "contain",
+              }}
             />
 
             <Text

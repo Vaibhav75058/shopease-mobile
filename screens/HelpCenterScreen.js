@@ -3,6 +3,7 @@ import React from "react";
 import {
   View,
   Text,
+  Image,
   StyleSheet,
   TouchableOpacity,
   ScrollView,
@@ -106,10 +107,14 @@ export default function HelpCenterScreen() {
           style={styles.supportBanner}
         >
 
-          <Ionicons
-            name="help-buoy"
-            size={60}
-            color="white"
+          <Image
+            source={require("../assets/icons/support.png")}
+            style={{
+              width: 60,
+              height: 60,
+              tintColor: "white",
+              resizeMode: "contain",
+            }}
           />
 
           <Text
@@ -167,14 +172,40 @@ export default function HelpCenterScreen() {
 
                   >
 
-                    <Ionicons
+                    <Image
+                      source={
+                        item.title === "Track My Order"
 
-                      name={item.icon}
+                          ? require("../assets/icons/track-order.png")
 
-                      size={24}
+                          : item.title === "Return & Refund"
 
-                      color="white"
+                            ? require("../assets/icons/refund.png")
 
+                            : item.title === "Payment Issues"
+
+                              ? require("../assets/icons/payment.png")
+
+                              : item.title === "Account & Security"
+
+                                ? require("../assets/icons/security.png")
+
+                                : item.title === "Shipping Information"
+
+                                  ? require("../assets/icons/shipping.png")
+
+                                  : item.title === "Contact Support"
+
+                                    ? require("../assets/icons/support-headset.png")
+
+                                    : require("../assets/icons/help-center.png")
+                      }
+                      style={{
+                        width: 24,
+                        height: 24,
+                        tintColor: "white",
+                        resizeMode: "contain",
+                      }}
                     />
 
                   </View>
@@ -197,14 +228,14 @@ export default function HelpCenterScreen() {
 
                   </View>
 
-                  <Ionicons
-
-                    name="chevron-forward"
-
-                    size={22}
-
-                    color="gray"
-
+                  <Image
+                    source={require("../assets/icons/right-arrow.png")}
+                    style={{
+                      width: 22,
+                      height: 22,
+                      tintColor: "gray",
+                      resizeMode: "contain",
+                    }}
                   />
 
                 </TouchableOpacity>
@@ -244,15 +275,15 @@ export default function HelpCenterScreen() {
 
           >
 
-            <Ionicons
-
-              name="call"
-
-              size={22}
-
-              color="white"
-
-            />
+            <Image
+  source={require("../assets/icons/call.png")}
+  style={{
+    width: 22,
+    height: 22,
+    tintColor: "white",
+    resizeMode: "contain",
+  }}
+/>
 
             <Text
               style={
@@ -289,15 +320,15 @@ export default function HelpCenterScreen() {
 
           >
 
-            <Ionicons
-
-              name="mail"
-
-              size={22}
-
-              color="white"
-
-            />
+            <Image
+  source={require("../assets/icons/email.png")}
+  style={{
+    width: 22,
+    height: 22,
+    tintColor: "white",
+    resizeMode: "contain",
+  }}
+/>
 
             <Text
               style={

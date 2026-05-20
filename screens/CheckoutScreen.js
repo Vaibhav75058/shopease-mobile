@@ -100,7 +100,11 @@ export default function CheckoutScreen({
       ? 0
       : 49;
 
-  const platformFee = 9;
+  const platformFee =
+
+    itemsTotal > 0
+      ? 9
+      : 0;
 
   const totalAmount =
     itemsTotal +
@@ -348,7 +352,7 @@ export default function CheckoutScreen({
                     styles.addressCard,
 
                     selectedAddress?._id ===
-                      item._id && {
+                    item._id && {
 
                       borderColor:
                         "#2874f0",
@@ -386,23 +390,19 @@ export default function CheckoutScreen({
 
                     </Text>
 
-                    <Ionicons
+                    <Image
+                      source={
+                        selectedAddress?._id === item._id
 
-                      name={
+                          ? require("../assets/icons/radio-selected.png")
 
-                        selectedAddress?._id ===
-                        item._id
-
-                          ? "radio-button-on"
-
-                          : "radio-button-off"
-
+                          : require("../assets/icons/radio-unselected.png")
                       }
-
-                      size={22}
-
-                      color="#2874f0"
-
+                      style={{
+                        width: 22,
+                        height: 22,
+                        resizeMode: "contain",
+                      }}
                     />
 
                   </View>
@@ -583,25 +583,20 @@ export default function CheckoutScreen({
                     }
                   >
 
-                    <Ionicons
+                    <Image
+                      source={
+                        paymentMethod === method
 
-                      name={
+                          ? require("../assets/icons/radio-selected.png")
 
-                        paymentMethod ===
-                        method
-
-                          ? "radio-button-on"
-
-                          : "radio-button-off"
-
+                          : require("../assets/icons/radio-unselected.png")
                       }
-
-                      size={22}
-
-                      color="#2874f0"
-
+                      style={{
+                        width: 22,
+                        height: 22,
+                        resizeMode: "contain",
+                      }}
                     />
-
                     <Text
                       style={
                         styles.paymentText
