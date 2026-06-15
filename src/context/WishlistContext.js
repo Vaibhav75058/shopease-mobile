@@ -5,7 +5,7 @@ import React, {
   useState,
 } from "react";
 
-import axios from "axios";
+import API from "../services/api";
 
 import {
   useAuth,
@@ -44,18 +44,10 @@ export const WishlistProvider =
         try {
 
           const res =
-            await axios.get(
+            await API.get(
 
-              "https://e-commerce-mern-stack-0okr.onrender.com/api/wishlist",
+              "/wishlist"
 
-              {
-                headers: {
-
-                  Authorization:
-                    `Bearer ${user.token}`,
-
-                },
-              }
             );
 
           setWishlist(
@@ -77,23 +69,15 @@ export const WishlistProvider =
 
         try {
 
-          await axios.post(
+          await API.post(
 
-            "https://e-commerce-mern-stack-0okr.onrender.com/api/wishlist",
+            "/wishlist",
 
             {
               productId:
                 product._id,
-            },
-
-            {
-              headers: {
-
-                Authorization:
-                  `Bearer ${user.token}`,
-
-              },
             }
+
           );
 
           fetchWishlist();
@@ -113,18 +97,10 @@ export const WishlistProvider =
 
         try {
 
-          await axios.delete(
+          await API.delete(
 
-            `https://e-commerce-mern-stack-0okr.onrender.com/api/wishlist/${id}`,
+            `/wishlist/${id}`
 
-            {
-              headers: {
-
-                Authorization:
-                  `Bearer ${user.token}`,
-
-              },
-            }
           );
 
           fetchWishlist();

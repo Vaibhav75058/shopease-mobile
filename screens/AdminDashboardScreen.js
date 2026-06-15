@@ -3,7 +3,7 @@ import React, {
   useState,
 } from "react";
 
-import axios from "axios";
+import API from "../src/services/api";
 
 import {
   View,
@@ -17,17 +17,11 @@ import {
   SafeAreaView,
 } from "react-native-safe-area-context";
 
-import {
-  useAuth,
-} from "../src/context/AuthContext";
+
 
 export default function AdminDashboardScreen() {
 
-  const auth =
-    useAuth();
 
-  const user =
-    auth?.user;
 
   const [
     loading,
@@ -60,39 +54,24 @@ export default function AdminDashboardScreen() {
 
       try {
 
-        const config = {
-
-          headers: {
-
-            Authorization:
-              `Bearer ${user.token}`,
-
-          },
-
-        };
-
         const usersRes =
-          await axios.get(
+          await API.get(
 
-            "https://e-commerce-mern-stack-0okr.onrender.com/api/users",
-
-            config
+            "/users"
 
           );
 
         const productsRes =
-          await axios.get(
+          await API.get(
 
-            "https://e-commerce-mern-stack-0okr.onrender.com/api/products"
+            "/products"
 
           );
 
         const ordersRes =
-          await axios.get(
+          await API.get(
 
-            "https://e-commerce-mern-stack-0okr.onrender.com/api/orders",
-
-            config
+            "/orders"
 
           );
 
@@ -294,7 +273,7 @@ const styles = StyleSheet.create({
 
     fontSize: 28,
 
-    fontWeight: "bold",
+    fontFamily: "Poppins_700Bold",
 
     marginBottom: 20,
 
@@ -332,7 +311,7 @@ const styles = StyleSheet.create({
 
     fontSize: 28,
 
-    fontWeight: "bold",
+    fontFamily: "Poppins_700Bold",
 
     color: "#2874f0",
 
@@ -350,7 +329,7 @@ const styles = StyleSheet.create({
 
     fontSize: 22,
 
-    fontWeight: "bold",
+    fontFamily: "Poppins_700Bold",
 
     marginVertical: 20,
 
@@ -381,7 +360,7 @@ const styles = StyleSheet.create({
 
     fontSize: 22,
 
-    fontWeight: "bold",
+    fontFamily: "Poppins_700Bold",
 
     marginTop: 8,
 
@@ -391,7 +370,7 @@ const styles = StyleSheet.create({
 
     color: "green",
 
-    fontWeight: "bold",
+    fontFamily: "Poppins_700Bold",
 
     marginTop: 8,
 

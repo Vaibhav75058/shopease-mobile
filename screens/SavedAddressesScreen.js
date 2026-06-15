@@ -9,22 +9,15 @@ import {
   FlatList,
   TouchableOpacity,
   StyleSheet,
-  SafeAreaView,
   Alert,
+  RefreshControl,
+  ActivityIndicator,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { colors, fonts, typography, spacing, radius, shadows } from "../src/theme";
+import { useFocusEffect } from "@react-navigation/native";
 
-import {
-  useFocusEffect,
-} from "@react-navigation/native";
-
-import Ionicons
-  from "@expo/vector-icons/Ionicons";
-
-import axios from "axios";
-
-import {
-  useAuth,
-} from "../src/context/AuthContext";
+import API from "../src/services/api";
 
 export default function SavedAddressesScreen({
 
@@ -32,45 +25,30 @@ export default function SavedAddressesScreen({
 
 }) {
 
-  const {
-    user,
-  } = useAuth();
+
 
   const [
     addresses,
     setAddresses,
   ] = useState([]);
 
+  const [loading, setLoading] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
+
   const fetchAddresses =
-    async () => {
-
+    async (isRefresh = false) => {
       try {
+        if (isRefresh) setRefreshing(true);
+        else setLoading(true);
 
-        const res =
-          await axios.get(
-
-            "https://e-commerce-mern-stack-0okr.onrender.com/api/address",
-
-            {
-              headers: {
-
-                Authorization:
-                  `Bearer ${user.token}`,
-
-              },
-            }
-          );
-
-        setAddresses(
-          res.data || []
-        );
-
+        const res = await API.get("/address");
+        setAddresses(res.data || []);
       } catch (error) {
-
         console.log(error);
-
+      } finally {
+        setLoading(false);
+        setRefreshing(false);
       }
-
     };
 
   useFocusEffect(
@@ -89,19 +67,12 @@ export default function SavedAddressesScreen({
     async (id) => {
 
       try {
+        setLoading(true);
 
-        await axios.delete(
+        await API.delete(
 
-          `https://e-commerce-mern-stack-0okr.onrender.com/api/address/${id}`,
+          `/address/${id}`
 
-          {
-            headers: {
-
-              Authorization:
-                `Bearer ${user.token}`,
-
-            },
-          }
         );
 
         fetchAddresses();
@@ -110,6 +81,8 @@ export default function SavedAddressesScreen({
 
         console.log(error);
 
+      } finally {
+        setLoading(false);
       }
 
     };
@@ -187,11 +160,18 @@ export default function SavedAddressesScreen({
 
       </TouchableOpacity>
 
+      {/* LOADING */}
+      {loading && !refreshing && (
+        <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+          <ActivityIndicator size="large" color={colors.primary} />
+        </View>
+      )}
+
       {/* EMPTY */}
 
       {
 
-        addresses.length ===
+        !loading && addresses.length ===
           0 ? (
 
           <View
@@ -221,7 +201,7 @@ export default function SavedAddressesScreen({
 
           </View>
 
-        ) : (
+        ) : !loading ? (
 
           <FlatList
 
@@ -235,6 +215,14 @@ export default function SavedAddressesScreen({
 
             showsVerticalScrollIndicator={
               false
+            }
+
+            refreshControl={
+              <RefreshControl
+                refreshing={refreshing}
+                onRefresh={() => fetchAddresses(true)}
+                tintColor={colors.primary}
+              />
             }
 
             renderItem={({
@@ -427,7 +415,7 @@ export default function SavedAddressesScreen({
 
           />
 
-        )
+        ) : null
 
       }
 
@@ -445,30 +433,26 @@ const styles =
       flex: 1,
 
       backgroundColor:
-        "#f5f7fb",
+        colors.background,
 
-      padding: 15,
+      padding: spacing.md,
 
     },
 
-
-
     heading: {
 
-      fontSize: 28,
-
-      fontWeight: "bold",
+      ...typography.h2,
 
     },
 
     addBtn: {
 
       backgroundColor:
-        "#8a8a8b",
+        colors.primary,
 
-      padding: 11,
+      padding: spacing.sm,
 
-      borderRadius: 15,
+      borderRadius: radius.md,
 
       flexDirection: "row",
 
@@ -477,34 +461,32 @@ const styles =
 
       alignItems: "center",
 
-      marginBottom: 20,
+      marginBottom: spacing.md,
 
     },
 
     addText: {
 
-      color: "white",
+      color: colors.surface,
 
-      fontWeight: "bold",
+      ...typography.button,
 
-      marginLeft: 8,
-
-      fontSize: 16,
+      marginLeft: spacing.sm,
 
     },
 
     card: {
 
       backgroundColor:
-        "white",
+        colors.surface,
 
-      borderRadius: 18,
+      borderRadius: radius.lg,
 
-      padding: 18,
+      padding: spacing.md,
 
-      marginBottom: 15,
+      marginBottom: spacing.md,
 
-      elevation: 3,
+      ...shadows.sm,
 
     },
 
@@ -518,51 +500,50 @@ const styles =
         "flex-start",
 
       backgroundColor:
-        "#eef4ff",
+        colors.background,
 
-      paddingHorizontal: 12,
+      paddingHorizontal: spacing.sm,
 
-      paddingVertical: 6,
+      paddingVertical: spacing.xs,
 
-      borderRadius: 20,
+      borderRadius: radius.xl,
 
-      marginBottom: 12,
+      marginBottom: spacing.sm,
 
     },
 
     typeText: {
 
-      color: "#2874f0",
+      color: colors.primary,
 
-      fontWeight: "bold",
+      ...typography.subtitle,
 
-      marginLeft: 6,
+      marginLeft: spacing.xs,
 
     },
 
     name: {
 
-      fontSize: 18,
+      ...typography.h3,
 
-      fontWeight: "bold",
-
-      marginBottom: 8,
+      marginBottom: spacing.xs,
 
     },
 
     address: {
 
-      color: "#555",
+      color: colors.textSecondary,
 
-      lineHeight: 22,
+      ...typography.body,
 
     },
 
     phone: {
 
-      marginTop: 10,
+      marginTop: spacing.sm,
 
-      color: "#444",
+      color: colors.textSecondary,
+      ...typography.body,
 
     },
 
@@ -573,7 +554,7 @@ const styles =
       justifyContent:
         "space-between",
 
-      marginTop: 18,
+      marginTop: spacing.md,
 
     },
 
@@ -584,13 +565,13 @@ const styles =
       alignItems: "center",
 
       backgroundColor:
-        "#2874f0",
+        colors.primary,
 
-      paddingVertical: 10,
+      paddingVertical: spacing.sm,
 
-      paddingHorizontal: 22,
+      paddingHorizontal: spacing.xl,
 
-      borderRadius: 12,
+      borderRadius: radius.md,
 
     },
 
@@ -601,23 +582,23 @@ const styles =
       alignItems: "center",
 
       backgroundColor:
-        "#e94560",
+        colors.error,
 
-      paddingVertical: 10,
+      paddingVertical: spacing.sm,
 
-      paddingHorizontal: 22,
+      paddingHorizontal: spacing.xl,
 
-      borderRadius: 12,
+      borderRadius: radius.md,
 
     },
 
     btnText: {
 
-      color: "white",
+      color: colors.surface,
 
-      fontWeight: "bold",
+      ...typography.button,
 
-      marginLeft: 6,
+      marginLeft: spacing.xs,
 
     },
 
@@ -631,17 +612,15 @@ const styles =
       alignItems:
         "center",
 
-      marginTop: 100,
+      marginTop: spacing.xxxl,
 
     },
 
     emptyTitle: {
 
-      fontSize: 22,
+      ...typography.h3,
 
-      fontWeight: "bold",
-
-      marginTop: 15,
+      marginTop: spacing.md,
 
     },
 

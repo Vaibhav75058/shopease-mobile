@@ -81,7 +81,7 @@ const styles = StyleSheet.create({
 
     backgroundColor: "white",
 
-    borderRadius: 18,
+    borderRadius: 12,
 
     flexDirection: "row",
 
@@ -89,11 +89,11 @@ const styles = StyleSheet.create({
 
     paddingHorizontal: 15,
 
-    height: 58,
+    height: 48,
 
-    elevation: 4,
+    elevation: 3,
 
-    marginBottom: 20,
+    marginBottom: 12,
 
   },
 

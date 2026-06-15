@@ -1,5 +1,4 @@
 import React from "react";
-
 import {
   View,
   Text,
@@ -8,330 +7,169 @@ import {
   TouchableOpacity,
   StyleSheet,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
-import Ionicons
-  from "@expo/vector-icons/Ionicons";
+import { useWishlist } from "../src/context/WishlistContext";
+import { useCart } from "../src/context/CartContext";
+import { colors, typography, spacing, radius, shadows } from "../src/theme";
 
-import {
-  useWishlist,
-} from "../src/context/WishlistContext";
+export default function WishlistScreen({ navigation }) {
+  const { wishlist, removeFromWishlist } = useWishlist();
+  const { addToCart } = useCart();
 
-export default function WishlistScreen({
-
-  navigation,
-
-}) {
-
-  const {
-
-    wishlist,
-
-    removeFromWishlist,
-
-  } = useWishlist();
+  const handleMoveToCart = (item) => {
+    addToCart(item);
+    removeFromWishlist(item._id);
+  };
 
   return (
+    <SafeAreaView style={styles.container} edges={["left", "right"]}>
 
-    <View
-      style={styles.container}
-    >
-
-      {/* HEADER */}
-
-      <Text
-        style={styles.heading}
-      >
-
-        My Wishlist ❤️
-
-      </Text>
-
-      {
-
-        wishlist.length ===
-          0 ? (
-
-          <View
-            style={
-              styles.emptyContainer
-            }
+      {wishlist.length === 0 ? (
+        <View style={styles.emptyContainer}>
+          <Image
+            source={require("../assets/icons/empty-wishlist.png")}
+            style={{
+              width: 90,
+              height: 90,
+              tintColor: colors.textLight,
+              resizeMode: "contain",
+            }}
+          />
+          <Text style={styles.emptyText}>Wishlist is Empty</Text>
+          <TouchableOpacity
+            style={styles.emptyCtaButton}
+            onPress={() => navigation.navigate("MainTabs", { screen: "Home" })}
           >
-
-            <Image
-  source={require("../assets/icons/empty-wishlist.png")}
-  style={{
-    width: 90,
-    height: 90,
-    tintColor: "#ccc",
-    resizeMode: "contain",
-  }}
-/>
-            <Text
-              style={
-                styles.emptyText
-              }
+            <Text style={styles.emptyCtaText}>Explore Products</Text>
+          </TouchableOpacity>
+        </View>
+      ) : (
+        <FlatList
+          data={wishlist}
+          keyExtractor={(item) => item._id}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{ paddingBottom: spacing.xxl }}
+          renderItem={({ item }) => (
+            <TouchableOpacity
+              activeOpacity={0.9}
+              style={styles.card}
+              onPress={() => navigation.navigate("ProductDetails", { product: item })}
             >
+              {/* IMAGE */}
+              <Image source={{ uri: item.image }} style={styles.image} />
 
-              Wishlist is Empty
-
-            </Text>
-
-          </View>
-
-        ) : (
-
-          <FlatList
-
-            data={wishlist}
-
-            keyExtractor={(
-              item
-            ) =>
-              item._id
-            }
-
-            showsVerticalScrollIndicator={
-              false
-            }
-
-            renderItem={({
-              item,
-            }) => (
-
-              <TouchableOpacity
-
-                style={
-                  styles.card
-                }
-
-                onPress={() =>
-
-                  navigation.navigate(
-
-                    "ProductDetails",
-
-                    {
-                      product:
-                        item,
-                    }
-
-                  )
-
-                }
-
-              >
-
-                {/* IMAGE */}
-
-                <Image
-
-                  source={{
-                    uri:
-                      item.image,
-                  }}
-
-                  style={
-                    styles.image
-                  }
-
-                />
-
-                {/* INFO */}
-
-                <View
-                  style={
-                    styles.info
-                  }
-                >
-
-                  <Text
-
-                    numberOfLines={2}
-
-                    style={
-                      styles.name
-                    }
-
-                  >
-
-                    {item.name}
-
-                  </Text>
-
-                  <Text
-                    style={
-                      styles.price
-                    }
-                  >
-
-                    ₹ {item.price}
-
-                  </Text>
-
-                </View>
-
-                {/* DELETE */}
+              {/* INFO */}
+              <View style={styles.info}>
+                <Text numberOfLines={2} style={styles.name}>{item.name}</Text>
+                <Text style={styles.price}>₹ {item.price?.toLocaleString("en-IN")}</Text>
 
                 <TouchableOpacity
-
-                  style={
-                    styles.deleteBtn
-                  }
-
-                  onPress={() =>
-
-                    removeFromWishlist(
-                      item._id
-                    )
-
-                  }
-
+                  style={styles.moveToCartBtn}
+                  onPress={() => handleMoveToCart(item)}
                 >
-
-                 <Image
-  source={require("../assets/icons/delete.png")}
-  style={{
-    width: 22,
-    height: 22,
-    tintColor: "#e94560",
-    resizeMode: "contain",
-  }}
-/>
+                  <Text style={styles.moveToCartText}>Move to Cart</Text>
                 </TouchableOpacity>
+              </View>
 
+              {/* DELETE */}
+              <TouchableOpacity
+                style={styles.deleteBtn}
+                onPress={() => removeFromWishlist(item._id)}
+              >
+                <Image
+                  source={require("../assets/icons/delete.png")}
+                  style={{
+                    width: 22,
+                    height: 22,
+                    tintColor: colors.accent,
+                    resizeMode: "contain",
+                  }}
+                />
               </TouchableOpacity>
-
-            )}
-
-          />
-
-        )
-
-      }
-
-    </View>
-
+            </TouchableOpacity>
+          )}
+        />
+      )}
+    </SafeAreaView>
   );
-
 }
 
-const styles =
-  StyleSheet.create({
-
-    container: {
-
-      flex: 1,
-
-      backgroundColor:
-        "#f5f7fb",
-
-      padding: 15,
-
-    },
-
-    heading: {
-
-      fontSize: 30,
-
-      fontWeight: "bold",
-
-      marginBottom: 20,
-
-      color: "#111",
-
-    },
-
-    card: {
-
-      backgroundColor:
-        "white",
-
-      borderRadius: 20,
-
-      padding: 14,
-
-      marginBottom: 16,
-
-      flexDirection: "row",
-
-      alignItems: "center",
-
-      elevation: 3,
-
-    },
-
-    image: {
-
-      width: 90,
-
-      height: 90,
-
-      borderRadius: 15,
-
-      resizeMode: "cover",
-
-    },
-
-    info: {
-
-      flex: 1,
-
-      marginLeft: 15,
-
-    },
-
-    name: {
-
-      fontSize: 16,
-
-      fontWeight: "600",
-
-      color: "#111",
-
-    },
-
-    price: {
-
-      fontSize: 20,
-
-      fontWeight: "bold",
-
-      color: "#2874f0",
-
-      marginTop: 10,
-
-    },
-
-    deleteBtn: {
-
-      padding: 10,
-
-    },
-
-    emptyContainer: {
-
-      flex: 1,
-
-      justifyContent:
-        "center",
-
-      alignItems:
-        "center",
-
-      marginTop: 100,
-
-    },
-
-    emptyText: {
-
-      fontSize: 22,
-
-      fontWeight: "bold",
-
-      color: "gray",
-
-      marginTop: 15,
-
-    },
-
-  });
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: colors.background,
+    paddingHorizontal: spacing.md,
+    paddingTop: spacing.sm,
+  },
+  heading: {
+    ...typography.h1,
+    marginBottom: spacing.lg,
+  },
+  card: {
+    backgroundColor: colors.surface,
+    borderRadius: radius.xl,
+    padding: spacing.md,
+    marginBottom: spacing.md,
+    flexDirection: "row",
+    alignItems: "center",
+    ...shadows.sm,
+  },
+  image: {
+    width: 90,
+    height: 90,
+    borderRadius: radius.lg,
+    resizeMode: "cover",
+  },
+  info: {
+    flex: 1,
+    marginLeft: spacing.md,
+  },
+  name: {
+    ...typography.h4,
+    color: colors.textPrimary,
+  },
+  price: {
+    ...typography.priceSmall,
+    color: colors.primary,
+    marginTop: spacing.xs,
+  },
+  moveToCartBtn: {
+    marginTop: spacing.sm,
+    backgroundColor: colors.primaryLight,
+    paddingVertical: spacing.xs,
+    paddingHorizontal: spacing.sm,
+    borderRadius: radius.md,
+    alignSelf: "flex-start",
+  },
+  moveToCartText: {
+    ...typography.labelSmall,
+    color: colors.primary,
+  },
+  deleteBtn: {
+    padding: spacing.sm,
+    alignSelf: "flex-start",
+  },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 100,
+  },
+  emptyText: {
+    ...typography.h2,
+    color: colors.textMuted,
+    marginTop: spacing.md,
+  },
+  emptyCtaButton: {
+    marginTop: spacing.xl,
+    backgroundColor: colors.primary,
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.xl,
+    borderRadius: radius.full,
+    ...shadows.md,
+  },
+  emptyCtaText: {
+    ...typography.button,
+  },
+});

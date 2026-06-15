@@ -8,61 +8,50 @@ import {
   TouchableOpacity,
   ScrollView,
   Linking,
+  Alert,
 } from "react-native";
-
-import {
-  SafeAreaView,
-} from "react-native-safe-area-context";
-
-import Ionicons
-  from "@expo/vector-icons/Ionicons";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { colors, fonts, typography, spacing, radius, shadows } from "../src/theme";
 
 export default function HelpCenterScreen() {
 
   const helpOptions = [
-
     {
       id: 1,
       title: "Track My Order",
-      icon: "cube-outline",
-      color: "#2874f0",
+      image: require("../assets/icons/track-order.png"),
+      color: colors.primary,
     },
-
     {
       id: 2,
       title: "Return & Refund",
-      icon: "refresh-circle-outline",
+      image: require("../assets/icons/refund.png"),
       color: "#ff9800",
     },
-
     {
       id: 3,
       title: "Payment Issues",
-      icon: "card-outline",
+      image: require("../assets/icons/payment.png"),
       color: "#4caf50",
     },
-
     {
       id: 4,
       title: "Account & Security",
-      icon: "shield-checkmark-outline",
+      image: require("../assets/icons/security.png"),
       color: "#9c27b0",
     },
-
     {
       id: 5,
       title: "Shipping Information",
-      icon: "car-outline",
+      image: require("../assets/icons/shipping.png"),
       color: "#e91e63",
     },
-
     {
       id: 6,
       title: "Contact Support",
-      icon: "headset-outline",
+      image: require("../assets/icons/support-headset.png"),
       color: "#009688",
     },
-
   ];
 
   return (
@@ -148,58 +137,18 @@ export default function HelpCenterScreen() {
               (item) => (
 
                 <TouchableOpacity
-
                   key={item.id}
-
-                  style={
-                    styles.optionCard
-                  }
-
+                  style={styles.optionCard}
+                  onPress={() => Alert.alert(item.title, "Coming soon!")}
                 >
-
                   <View
-
                     style={[
-
                       styles.iconBox,
-
-                      {
-                        backgroundColor:
-                          item.color,
-                      },
-
+                      { backgroundColor: item.color },
                     ]}
-
                   >
-
                     <Image
-                      source={
-                        item.title === "Track My Order"
-
-                          ? require("../assets/icons/track-order.png")
-
-                          : item.title === "Return & Refund"
-
-                            ? require("../assets/icons/refund.png")
-
-                            : item.title === "Payment Issues"
-
-                              ? require("../assets/icons/payment.png")
-
-                              : item.title === "Account & Security"
-
-                                ? require("../assets/icons/security.png")
-
-                                : item.title === "Shipping Information"
-
-                                  ? require("../assets/icons/shipping.png")
-
-                                  : item.title === "Contact Support"
-
-                                    ? require("../assets/icons/support-headset.png")
-
-                                    : require("../assets/icons/help-center.png")
-                      }
+                      source={item.image}
                       style={{
                         width: 24,
                         height: 24,
@@ -358,103 +307,99 @@ const styles = StyleSheet.create({
 
     flex: 1,
 
-    backgroundColor: "#f5f7fb",
+    backgroundColor: colors.background,
 
-    paddingHorizontal: 15,
+    paddingHorizontal: spacing.md,
 
   },
 
   header: {
 
-    marginTop: 10,
+    marginTop: spacing.sm,
 
-    marginBottom: 20,
+    marginBottom: spacing.md,
 
   },
 
   heading: {
 
-    fontSize: 30,
+    ...typography.h1,
 
-    fontWeight: "bold",
-
-    color: "#111",
+    color: colors.text,
 
   },
 
   subHeading: {
 
-    color: "gray",
+    color: colors.textSecondary,
 
-    marginTop: 6,
+    marginTop: spacing.xs,
 
-    fontSize: 15,
+    ...typography.body,
 
   },
 
   supportBanner: {
 
-    backgroundColor: "#2874f0",
+    backgroundColor: colors.primary,
 
-    borderRadius: 24,
+    borderRadius: radius.xxl,
 
-    paddingVertical: 35,
+    paddingVertical: spacing.xxxl,
 
     alignItems: "center",
 
-    marginBottom: 25,
+    marginBottom: spacing.xl,
 
-    elevation: 5,
+    ...shadows.md,
 
   },
 
   bannerTitle: {
 
-    color: "white",
+    color: colors.surface,
 
-    fontSize: 24,
+    ...typography.h2,
 
-    fontWeight: "bold",
-
-    marginTop: 15,
+    marginTop: spacing.md,
 
   },
 
   bannerSub: {
 
-    color: "white",
+    color: colors.surface,
 
-    marginTop: 8,
+    marginTop: spacing.xs,
 
-    fontSize: 15,
+    ...typography.body,
 
     textAlign: "center",
 
-    paddingHorizontal: 30,
+    paddingHorizontal: spacing.xxl,
 
   },
 
   optionsContainer: {
 
-    marginBottom: 30,
+    marginBottom: spacing.xxl,
 
   },
 
   optionCard: {
 
-    backgroundColor: "white",
+    backgroundColor: colors.surface,
 
-    borderRadius: 20,
+    borderRadius: radius.xl,
 
-    padding: 18,
+    padding: spacing.md,
 
     flexDirection: "row",
 
     alignItems: "center",
 
-    marginBottom: 16,
+    marginBottom: spacing.md,
 
-    elevation: 2,
+    ...shadows.sm,
 
   },
 
@@ -464,59 +409,55 @@ const styles = StyleSheet.create({
 
     height: 50,
 
-    borderRadius: 15,
+    borderRadius: radius.md,
 
     justifyContent: "center",
 
     alignItems: "center",
 
-    marginRight: 15,
+    marginRight: spacing.md,
 
   },
 
   optionText: {
 
-    fontSize: 16,
+    ...typography.subtitle,
 
-    fontWeight: "600",
-
-    color: "#111",
+    color: colors.text,
 
   },
 
   contactBox: {
 
-    backgroundColor: "white",
+    backgroundColor: colors.surface,
 
-    borderRadius: 24,
+    borderRadius: radius.xxl,
 
-    padding: 22,
+    padding: spacing.xl,
 
-    marginBottom: 40,
+    marginBottom: spacing.xxxl,
 
-    elevation: 2,
+    ...shadows.sm,
 
   },
 
   contactTitle: {
 
-    fontSize: 22,
+    ...typography.h2,
 
-    fontWeight: "bold",
+    marginBottom: spacing.md,
 
-    marginBottom: 20,
-
-    color: "#111",
+    color: colors.text,
 
   },
 
   contactBtn: {
 
-    backgroundColor: "#2874f0",
+    backgroundColor: colors.primary,
 
-    borderRadius: 16,
+    borderRadius: radius.md,
 
-    paddingVertical: 16,
+    paddingVertical: spacing.md,
 
     flexDirection: "row",
 
@@ -524,19 +465,17 @@ const styles = StyleSheet.create({
 
     alignItems: "center",
 
-    marginBottom: 15,
+    marginBottom: spacing.md,
 
   },
 
   contactText: {
 
-    color: "white",
+    color: colors.surface,
 
-    fontWeight: "bold",
+    ...typography.button,
 
-    fontSize: 16,
-
-    marginLeft: 10,
+    marginLeft: spacing.sm,
 
   },
 

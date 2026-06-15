@@ -12,20 +12,18 @@ import {
   TextInput,
   Alert,
   ScrollView,
+  KeyboardAvoidingView,
+  Platform,
+  ActivityIndicator,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { colors, fonts, typography, spacing, radius, shadows } from "../src/theme";
 
 import * as Location
   from "expo-location";
 
-import axios
-  from "axios";
-
-import Ionicons
-  from "@expo/vector-icons/Ionicons";
-
-import {
-  useAuth,
-} from "../src/context/AuthContext";
+import API
+  from "../src/services/api";
 
 export default function AddAddressScreen({
 
@@ -35,9 +33,7 @@ export default function AddAddressScreen({
 
 }) {
 
-  const {
-    user,
-  } = useAuth();
+
 
   /* EDIT DATA */
 
@@ -46,6 +42,8 @@ export default function AddAddressScreen({
 
   const isEdit =
     !!editData;
+
+  const [saving, setSaving] = useState(false);
 
   const [
     form,
@@ -200,25 +198,23 @@ export default function AddAddressScreen({
     async () => {
 
       try {
+        if (!form.fullName || !form.phone || !form.flat || !form.area || !form.city || !form.state || !form.pincode) {
+          Alert.alert("Validation Error", "Please fill all required fields");
+          return;
+        }
+
+        setSaving(true);
 
         if (isEdit) {
 
           /* UPDATE */
 
-          await axios.put(
+          await API.put(
 
-            `https://e-commerce-mern-stack-0okr.onrender.com/api/address/${editData._id}`,
+            `/address/${editData._id}`,
 
-            form,
+            form
 
-            {
-              headers: {
-
-                Authorization:
-                  `Bearer ${user.token}`,
-
-              },
-            }
           );
 
           Alert.alert(
@@ -230,20 +226,12 @@ export default function AddAddressScreen({
 
           /* NEW SAVE */
 
-          await axios.post(
+          await API.post(
 
-            "https://e-commerce-mern-stack-0okr.onrender.com/api/address",
+            "/address",
 
-            form,
+            form
 
-            {
-              headers: {
-
-                Authorization:
-                  `Bearer ${user.token}`,
-
-              },
-            }
           );
 
           Alert.alert(
@@ -263,19 +251,26 @@ export default function AddAddressScreen({
 
           error.message
         );
+        Alert.alert("Error", "Failed to save address");
 
+      } finally {
+        setSaving(false);
       }
 
     };
 
   return (
-
-    <ScrollView
-      style={styles.container}
-      showsVerticalScrollIndicator={
-        false
-      }
-    >
+    <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
+      >
+        <ScrollView
+          style={styles.container}
+          showsVerticalScrollIndicator={
+            false
+          }
+        >
 
       {/* LOCATION */}
 
@@ -467,10 +462,12 @@ export default function AddAddressScreen({
           }
 
         </Text>
-
+        {saving && <ActivityIndicator color={colors.surface} style={{ marginLeft: spacing.sm }} />}
       </TouchableOpacity>
 
     </ScrollView>
+    </KeyboardAvoidingView>
+    </SafeAreaView>
 
   );
 
@@ -484,20 +481,20 @@ const styles =
       flex: 1,
 
       backgroundColor:
-        "#fff",
+        colors.background,
 
-      padding: 15,
+      padding: spacing.md,
 
     },
 
     locationBtn: {
 
       backgroundColor:
-        "#2874f0",
+        colors.primary,
 
-      padding: 16,
+      padding: spacing.md,
 
-      borderRadius: 15,
+      borderRadius: radius.md,
 
       flexDirection: "row",
 
@@ -506,19 +503,17 @@ const styles =
 
       alignItems: "center",
 
-      marginBottom: 25,
+      marginBottom: spacing.xl,
 
     },
 
     locationText: {
 
-      color: "white",
+      color: colors.surface,
 
-      fontWeight: "bold",
+      ...typography.button,
 
-      marginLeft: 8,
-
-      fontSize: 16,
+      marginLeft: spacing.sm,
 
     },
 
@@ -527,48 +522,51 @@ const styles =
       borderWidth: 1,
 
       borderColor:
-        "#ddd",
+        colors.border,
 
-      borderRadius: 14,
+      borderRadius: radius.md,
 
-      padding: 15,
+      padding: spacing.md,
 
-      marginBottom: 16,
+      marginBottom: spacing.md,
 
-      fontSize: 15,
+      ...typography.body,
 
       backgroundColor:
-        "#fafafa",
+        colors.surface,
 
     },
 
     saveBtn: {
 
       backgroundColor:
-        "#2874f0",
+        colors.primary,
 
-      padding: 18,
+      padding: spacing.md,
 
-      borderRadius: 15,
+      borderRadius: radius.md,
 
-      marginTop: 10,
+      marginTop: spacing.sm,
 
-      marginBottom: 40,
+      marginBottom: spacing.xxl,
+
+      flexDirection: "row",
+
+      justifyContent: "center",
+
+      alignItems: "center",
 
     },
 
     saveText: {
 
-      color: "white",
+      color: colors.surface,
 
       textAlign:
         "center",
 
-      fontWeight:
-        "bold",
-
-      fontSize: 17,
+      ...typography.button,
 
     },
 
-  });
+  });

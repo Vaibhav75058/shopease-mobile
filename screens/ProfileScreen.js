@@ -1,5 +1,4 @@
-import React from "react";
-
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -9,427 +8,220 @@ import {
   Image,
   Alert,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { useAuth } from "../src/context/AuthContext";
+import { colors, fonts, typography, spacing, radius, shadows } from "../src/theme";
 
-import {
-  SafeAreaView,
-} from "react-native-safe-area-context";
-
-import Ionicons
-  from "@expo/vector-icons/Ionicons";
-
-import {
-  useAuth,
-} from "../src/context/AuthContext";
-
-export default function ProfileScreen({
-
-  navigation,
-
-}) {
-
+export default function ProfileScreen({ navigation }) {
   const auth = useAuth();
+  const user = auth?.user || {};
+  const logout = auth?.logout;
 
-  const user =
-    auth?.user || {};
+  const [imageError, setImageError] = useState(false);
 
-  const logout =
-    auth?.logout;
-
-  const handleMenuPress = (
-    title
-  ) => {
-
+  const handleMenuPress = (title) => {
     switch (title) {
-
+      case "Edit Profile":
+        navigation.navigate("EditProfile");
+        break;
+      case "Notifications":
+        navigation.navigate("Notifications");
+        break;
       case "My Orders":
-
-        navigation.navigate(
-          "MyOrders"
-        );
-
+        navigation.navigate("MyOrders");
         break;
-
       case "Wishlist":
-
-        navigation.navigate(
-          "Wishlist"
-        );
-
+        navigation.navigate("Wishlist");
         break;
-
       case "Saved Address":
-
-        navigation.navigate(
-          "SavedAddresses"
-        );
-
+        navigation.navigate("SavedAddresses");
         break;
-
       case "Help Center":
-
-  navigation.navigate(
-    "HelpCenter"
-  );
-
-  break;
-
+        navigation.navigate("HelpCenter");
         break;
-
       default:
         break;
-
     }
-
   };
 
   const menuItems = [
-
-    {
-      title: "My Orders",
-      icon: "bag-outline",
-    },
-
-    {
-      title: "Wishlist",
-      icon: "heart-outline",
-    },
-
-    {
-      title: "Saved Address",
-      icon: "location-outline",
-    },
-
-    {
-      title: "Help Center",
-      icon: "help-circle-outline",
-    },
-
+    { title: "Edit Profile" },
+    { title: "Notifications" },
+    { title: "My Orders" },
+    { title: "Wishlist" },
+    { title: "Saved Address" },
+    { title: "Help Center" },
   ];
 
   const handleLogout = () => {
+    Alert.alert("Logout", "Are you sure you want to logout?", [
+      { text: "Cancel", style: "cancel" },
+      { text: "Logout", style: "destructive", onPress: logout },
+    ]);
+  };
 
-    Alert.alert(
-
-      "Logout",
-
-      "Are you sure you want to logout?",
-
-      [
-
-        {
-          text: "Cancel",
-          style: "cancel",
-        },
-
-        {
-          text: "Logout",
-
-          style: "destructive",
-
-          onPress: logout,
-        },
-
-      ]
-
-    );
-
+  const getMenuIcon = (title) => {
+    switch (title) {
+      case "Edit Profile":
+        return require("../assets/icons/edit.png");
+      case "Notifications":
+        return require("../assets/icons/notification-bell.png");
+      case "My Orders":
+        return require("../assets/icons/orders.png");
+      case "Wishlist":
+        return require("../assets/icons/empty-wishlist.png");
+      case "Saved Address":
+        return require("../assets/icons/empty-location.png");
+      case "Help Center":
+        return require("../assets/icons/help-center.png");
+      default:
+        return require("../assets/icons/categories.png");
+    }
   };
 
   return (
-
-    <SafeAreaView
-      style={styles.container}
-    >
-
+    <SafeAreaView style={styles.container}>
       <ScrollView
-        showsVerticalScrollIndicator={
-          false
-        }
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ paddingBottom: 60 }}
       >
-
         {/* TOP PROFILE */}
-
         <View style={styles.topBox}>
-
           <Image
-
-            source={{
-
-              uri:
-                "https://cdn-icons-png.flaticon.com/512/3135/3135715.png",
-
-            }}
-
+            source={
+              imageError || !user?.avatar
+                ? require("../assets/icons/user-profile.png")
+                : { uri: user.avatar }
+            }
+            onError={() => setImageError(true)}
             style={styles.profileImage}
-
           />
-
-          <Text style={styles.name}>
-            {user?.name || "User"}
-          </Text>
-
-          <Text style={styles.email}>
-            {user?.email}
-          </Text>
-
+          <Text style={styles.name}>{user?.name || "User"}</Text>
+          <Text style={styles.email}>{user?.email}</Text>
         </View>
 
         {/* MENU */}
-
         <View style={styles.menuContainer}>
-
           {menuItems.map((item, index) => (
-
             <TouchableOpacity
-
               key={index}
-
               style={styles.menuItem}
-
-              onPress={() =>
-                handleMenuPress(
-                  item.title
-                )
-              }
-
+              onPress={() => handleMenuPress(item.title)}
             >
-
               <View style={styles.left}>
-
                 <Image
-  source={
-    item.title === "My Orders"
-
-      ? require("../assets/icons/orders.png")
-
-      : item.title === "Wishlist"
-
-      ? require("../assets/icons/empty-wishlist.png")
-
-      : item.title === "Saved Address"
-
-      ? require("../assets/icons/empty-location.png")
-
-      : item.title === "Help Center"
-
-      ? require("../assets/icons/help-center.png")
-
-      : require("../assets/icons/categories.png")
-  }
-  style={{
-    width: 24,
-    height: 24,
-    tintColor: "#2874f0",
-    resizeMode: "contain",
-  }}
-/>
-
-                <Text style={styles.menuText}>
-                  {item.title}
-                </Text>
-
+                  source={getMenuIcon(item.title)}
+                  style={{
+                    width: 24,
+                    height: 24,
+                    tintColor: colors.primary,
+                    resizeMode: "contain",
+                  }}
+                />
+                <Text style={styles.menuText}>{item.title}</Text>
               </View>
-
               <Image
-  source={require("../assets/icons/right-arrow.png")}
-  style={{
-    width: 22,
-    height: 22,
-    tintColor: "gray",
-    resizeMode: "contain",
-  }}
-/>
-
+                source={require("../assets/icons/right-arrow.png")}
+                style={{
+                  width: 22,
+                  height: 22,
+                  tintColor: colors.textLight,
+                  resizeMode: "contain",
+                }}
+              />
             </TouchableOpacity>
-
           ))}
-
         </View>
 
         {/* LOGOUT */}
-
-        <TouchableOpacity
-
-          style={styles.logoutButton}
-
-          onPress={handleLogout}
-
-        >
-
-         <Image
-  source={require("../assets/icons/logout.png")}
-  style={{
-    width: 24,
-    height: 24,
-    tintColor: "white",
-    resizeMode: "contain",
-  }}
-/>
-
-          <Text style={styles.logoutText}>
-            Logout
-          </Text>
-
+        <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+          <Image
+            source={require("../assets/icons/logout.png")}
+            style={{
+              width: 24,
+              height: 24,
+              tintColor: colors.textWhite,
+              resizeMode: "contain",
+            }}
+          />
+          <Text style={styles.logoutText}>Logout</Text>
         </TouchableOpacity>
 
         {/* VERSION */}
-
-        <Text style={styles.version}>
-          ShopEase v1.0.0
-        </Text>
-
+        <Text style={styles.version}>ShopEase v1.0.0</Text>
       </ScrollView>
-
     </SafeAreaView>
-
   );
-
 }
 
 const styles = StyleSheet.create({
-
   container: {
-
     flex: 1,
-
-    backgroundColor: "#f5f7fb",
-
+    backgroundColor: colors.background,
   },
-
   topBox: {
-
-    backgroundColor: "#2874f0",
-
+    backgroundColor: colors.primary,
     paddingVertical: 40,
-
     alignItems: "center",
-
     borderBottomLeftRadius: 30,
-
     borderBottomRightRadius: 30,
-
   },
-
   profileImage: {
-
     width: 100,
-
     height: 100,
-
     borderRadius: 50,
-
-    backgroundColor: "white",
-
+    backgroundColor: colors.surface,
   },
-
   name: {
-
-    fontSize: 24,
-
-    fontWeight: "bold",
-
-    color: "white",
-
-    marginTop: 15,
-
+    ...typography.h2,
+    color: colors.textWhite,
+    marginTop: spacing.md,
   },
-
   email: {
-
-    color: "white",
-
-    marginTop: 6,
-
-    fontSize: 15,
-
+    ...typography.body,
+    color: colors.textWhite,
+    marginTop: spacing.xs,
   },
-
   menuContainer: {
-
-    padding: 18,
-
-    marginTop: 10,
-
+    padding: spacing.lg,
+    marginTop: spacing.sm,
   },
-
   menuItem: {
-
-    backgroundColor: "white",
-
-    borderRadius: 18,
-
-    padding: 18,
-
+    backgroundColor: colors.surface,
+    borderRadius: radius.lg,
+    padding: spacing.lg,
     flexDirection: "row",
-
     justifyContent: "space-between",
-
     alignItems: "center",
-
-    marginBottom: 14,
-
-    elevation: 2,
-
+    marginBottom: spacing.md,
+    ...shadows.sm,
   },
-
   left: {
-
     flexDirection: "row",
-
     alignItems: "center",
-
   },
-
   menuText: {
-
-    fontSize: 16,
-
-    fontWeight: "600",
-
-    marginLeft: 14,
-
+    ...typography.h4,
+    marginLeft: spacing.md,
   },
-
   logoutButton: {
-
-    backgroundColor: "#e94560",
-
-    marginHorizontal: 18,
-
-    marginBottom: 20,
-
-    borderRadius: 18,
-
-    padding: 18,
-
+    backgroundColor: colors.accent,
+    marginHorizontal: spacing.lg,
+    marginBottom: spacing.xl,
+    borderRadius: radius.lg,
+    padding: spacing.lg,
     flexDirection: "row",
-
     justifyContent: "center",
-
     alignItems: "center",
-
   },
-
   logoutText: {
-
-    color: "white",
-
-    fontWeight: "bold",
-
-    fontSize: 18,
-
-    marginLeft: 10,
-
+    ...typography.button,
+    marginLeft: spacing.sm,
   },
-
   version: {
-
+    ...typography.caption,
     textAlign: "center",
-
-    color: "gray",
-
+    color: colors.textLight,
     marginBottom: 40,
-
   },
-
 });

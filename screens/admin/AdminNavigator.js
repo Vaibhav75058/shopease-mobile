@@ -9,91 +9,64 @@ import {
 } from "@react-navigation/material-top-tabs";
 
 import DashboardScreen from "./DashboardScreen";
-
 import ProductsScreen from "./ProductsScreen";
-
+import AddProductScreen from "./AddProductScreen";
 import OrdersScreen from "./OrdersScreen";
-
 import UsersScreen from "./UsersScreen";
-import CategoriesScreen
-  from "./CategoriesScreen";
-const Tab =
-  createMaterialTopTabNavigator();
+import CategoriesScreen from "./CategoriesScreen";
+
+const Tab = createMaterialTopTabNavigator();
 
 export default function AdminNavigator() {
 
   return (
-
-    <SafeAreaView
-      style={{ flex: 1 }}
-    >
-
+    <SafeAreaView style={{ flex: 1 }}>
       <Tab.Navigator
-
         screenOptions={{
-
-          tabBarActiveTintColor:
-            "black",
-
-          tabBarInactiveTintColor:
-            "#e94560",
-
+          tabBarActiveTintColor: "#2874f0",
+          tabBarInactiveTintColor: "#8e8e93",
           tabBarIndicatorStyle: {
-
-            backgroundColor:
-              "#e94560",
-
+            backgroundColor: "#2874f0",
           },
-
           tabBarStyle: {
-
-            backgroundColor:
-              "white",
-
+            backgroundColor: "white",
           },
-
           tabBarLabelStyle: {
-
-            fontWeight: "bold",
-
+            fontFamily: "Poppins_700Bold",
+            fontSize: 13,
           },
-
+          tabBarScrollEnabled: true,
+          tabBarItemStyle: {
+            width: "auto",
+            paddingHorizontal: 12,
+          },
         }}
-
       >
-
         <Tab.Screen
           name="Dashboard"
           component={DashboardScreen}
         />
-
         <Tab.Screen
           name="Products"
           component={ProductsScreen}
         />
         <Tab.Screen
-
+          name="Add Product"
+          component={AddProductScreen}
+        />
+        <Tab.Screen
           name="Categories"
-
-          component={
-            CategoriesScreen
-          }
-
+          component={CategoriesScreen}
         />
         <Tab.Screen
           name="Orders"
           component={OrdersScreen}
         />
-
         <Tab.Screen
           name="Users"
           component={UsersScreen}
         />
-
       </Tab.Navigator>
-
     </SafeAreaView>
-
   );
-
 }

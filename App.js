@@ -34,6 +34,7 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   Image,
+  Text,
 } from "react-native";
 
 import {
@@ -52,19 +53,18 @@ import {
   createBottomTabNavigator,
 } from "@react-navigation/bottom-tabs";
 
-import Ionicons
-  from "@expo/vector-icons/Ionicons";
-
-  import * as Font
-  from "expo-font";
+import * as Font from "expo-font";
 
 import {
-  MaterialIcons,
-  Feather,
-  AntDesign,
-} from "@expo/vector-icons";
+  Poppins_300Light,
+  Poppins_400Regular,
+  Poppins_500Medium,
+  Poppins_600SemiBold,
+  Poppins_700Bold,
+  Poppins_800ExtraBold,
+} from "@expo-google-fonts/poppins";
 
-
+import { colors } from "./src/theme";
 
 import HomeScreen
   from "./screens/HomeScreen";
@@ -81,11 +81,17 @@ import LoginScreen
 import RegisterScreen
   from "./screens/RegisterScreen";
 
+import ForgotPasswordScreen
+  from "./screens/ForgotPasswordScreen";
+
 import CartScreen
   from "./screens/CartScreen";
 
 import ProfileScreen
   from "./screens/ProfileScreen";
+
+import EditProfileScreen
+  from "./screens/EditProfileScreen";
 
 import CheckoutScreen
   from "./screens/CheckoutScreen";
@@ -114,14 +120,27 @@ const Stack =
 
 const Tab =
   createBottomTabNavigator();
+
 const loadFonts = async () => {
   try {
     await Font.loadAsync({
-      ...Ionicons.font,
-      ...MaterialIcons.font,
-      ...Feather.font,
-      ...AntDesign.font,
+      Poppins_300Light,
+      Poppins_400Regular,
+      Poppins_500Medium,
+      Poppins_600SemiBold,
+      Poppins_700Bold,
+      Poppins_800ExtraBold,
     });
+
+    // Set Poppins as default font for ALL Text components globally
+    const oldTextRender = Text.render;
+    Text.render = function (...args) {
+      const origin = oldTextRender.call(this, ...args);
+      return React.cloneElement(origin, {
+        style: [{ fontFamily: "Poppins_400Regular" }, origin.props.style],
+      });
+    };
+
     return true;
   } catch (error) {
     console.log('Font load error:', error);
@@ -179,7 +198,7 @@ function BottomTabs({
 
             fontSize: 12,
 
-            fontWeight: "600",
+            fontFamily: "Poppins_600SemiBold",
 
           },
 
@@ -249,7 +268,7 @@ function BottomTabs({
           },
 
           tabBarActiveTintColor:
-            "#2874f0",
+            colors.primary,
 
           tabBarInactiveTintColor:
             "gray",
@@ -353,7 +372,7 @@ function MainNavigator() {
 
           <Stack.Screen
 
-            name="Home"
+            name="MainTabs"
 
             component={
               BottomTabs
@@ -399,6 +418,10 @@ function MainNavigator() {
             component={
               ChatBotScreen
             }
+            options={{
+              headerShown:
+                false,
+            }}
           />
 
           <Stack.Screen
@@ -464,6 +487,15 @@ function MainNavigator() {
             }
 
           />
+          <Stack.Screen
+            name="EditProfile"
+            component={
+              EditProfileScreen
+            }
+            options={{
+              headerShown: false,
+            }}
+          />
         </>
 
       ) : (
@@ -491,6 +523,21 @@ function MainNavigator() {
 
             component={
               RegisterScreen
+            }
+
+            options={{
+              headerShown:
+                false,
+            }}
+
+          />
+
+          <Stack.Screen
+
+            name="ForgotPassword"
+
+            component={
+              ForgotPasswordScreen
             }
 
             options={{
