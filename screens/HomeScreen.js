@@ -316,49 +316,49 @@ export default function HomeScreen({ navigation }) {
         </TouchableOpacity>
 
         <SearchBar search={search} setSearch={setSearch} />
-
-        {/* STICKY CATEGORIES BAR (Text Pills - absolute) */}
-        <Animated.View
-          pointerEvents={showStickyBar ? "auto" : "none"}
-          style={[
-            styles.stickyBarContainer,
-            {
-              opacity: stickyOpacity,
-              transform: [{ translateY: stickyTranslateY }],
-            },
-          ]}
-        >
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={{ paddingRight: 20, alignItems: "center" }}
-          >
-            {dynamicCategories.map((item) => {
-              const isActive = selectedCategory === item.name;
-              return (
-                <TouchableOpacity
-                  key={item.name}
-                  style={[
-                    styles.stickyPill,
-                    isActive ? styles.stickyPillActive : styles.stickyPillInactive,
-                  ]}
-                  onPress={() => setSelectedCategory(item.name)}
-                  activeOpacity={0.8}
-                >
-                  <Text
-                    style={[
-                      styles.stickyPillText,
-                      isActive && styles.stickyPillTextActive,
-                    ]}
-                  >
-                    {item.name}
-                  </Text>
-                </TouchableOpacity>
-              );
-            })}
-          </ScrollView>
-        </Animated.View>
       </View>
+
+      {/* STICKY CATEGORIES BAR (Text Pills - between topSection and FlatList) */}
+      <Animated.View
+        pointerEvents={showStickyBar ? "auto" : "none"}
+        style={[
+          styles.stickyBarContainer,
+          {
+            opacity: stickyOpacity,
+            transform: [{ translateY: stickyTranslateY }],
+          },
+        ]}
+      >
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={{ paddingHorizontal: 4, paddingRight: 20, alignItems: "center" }}
+        >
+          {dynamicCategories.map((item) => {
+            const isActive = selectedCategory === item.name;
+            return (
+              <TouchableOpacity
+                key={item.name}
+                style={[
+                  styles.stickyPill,
+                  isActive ? styles.stickyPillActive : styles.stickyPillInactive,
+                ]}
+                onPress={() => setSelectedCategory(item.name)}
+                activeOpacity={0.8}
+              >
+                <Text
+                  style={[
+                    styles.stickyPillText,
+                    isActive && styles.stickyPillTextActive,
+                  ]}
+                >
+                  {item.name}
+                </Text>
+              </TouchableOpacity>
+            );
+          })}
+        </ScrollView>
+      </Animated.View>
 
       {/* PRODUCTS LIST */}
       <Animated.FlatList
@@ -1198,10 +1198,6 @@ const styles = StyleSheet.create({
     marginTop: 6,
   },
   stickyBarContainer: {
-    position: "absolute",
-    bottom: -46,
-    left: 0,
-    right: 0,
     height: 46,
     backgroundColor: "#f8f9fb",
     borderBottomWidth: 1,

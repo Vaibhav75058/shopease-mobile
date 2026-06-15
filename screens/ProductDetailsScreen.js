@@ -686,12 +686,25 @@ export default function ProductDetailsScreen({
             renderItem={({ item }) => {
               return (
                 <View style={styles.modalImageWrapper}>
-                  <ExpoImage
-                    source={{ uri: item }}
-                    style={styles.modalImage}
-                    contentFit="contain"
-                    transition={200}
-                  />
+                  <ScrollView
+                    maximumZoomScale={4}
+                    minimumZoomScale={1}
+                    bouncesZoom={true}
+                    showsHorizontalScrollIndicator={false}
+                    showsVerticalScrollIndicator={false}
+                    contentContainerStyle={{
+                      flex: 1,
+                      justifyContent: "center",
+                      alignItems: "center",
+                    }}
+                  >
+                    <ExpoImage
+                      source={{ uri: item }}
+                      style={styles.modalImage}
+                      contentFit="contain"
+                      transition={200}
+                    />
+                  </ScrollView>
                 </View>
               );
             }}
